@@ -31,4 +31,6 @@ android {
 }
 
 dependencies {
+    compile 'com.android.support:support-v4:+'
+    compile 'com.squareup:otto:1.3.4'
 }
