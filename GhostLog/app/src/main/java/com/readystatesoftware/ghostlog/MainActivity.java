@@ -2,6 +2,7 @@ package com.readystatesoftware.ghostlog;
 
 import android.app.ActionBar;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.ListPreference;
@@ -34,10 +35,19 @@ public class MainActivity extends PreferenceActivity {
         super.onCreate(savedInstanceState);
 
         mMainSwitch = new Switch(this);
+        mMainSwitch.setChecked(LogWindowService.isRunning());
         mMainSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 // TODO
+                Intent intent = new Intent(MainActivity.this, LogWindowService.class);
+                if (b) {
+                    if (!LogWindowService.isRunning()) {
+                        startService(intent);
+                    }
+                } else {
+                    stopService(intent);
+                }
             }
         });
 

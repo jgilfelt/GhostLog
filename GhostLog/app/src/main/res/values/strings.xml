@@ -13,5 +13,13 @@
     <string name="tag_filter">Tag Filter</string>
     <string name="none">None</string>
 
+    <string-array name="levels_entries">
+        <item>Verbose</item>
+        <item>Debug</item>
+        <item>Info</item>
+        <item>Warn</item>
+        <item>Error</item>
+        <item>Assert</item>
+    </string-array>
 
 </resources>

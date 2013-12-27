@@ -9,15 +9,6 @@
     <string name="pref_text_size">pref_text_size</string>
     <string name="pref_screen_tag_filter">pref_screen_tag_filter</string>
 
-    <string-array name="levels_entries">
-        <item>Verbose</item>
-        <item>Debug</item>
-        <item>Info</item>
-        <item>Warn</item>
-        <item>Error</item>
-        <item>Assert</item>
-    </string-array>
-
     <string-array name="levels_values">
         <item>0</item>
         <item>1</item>
