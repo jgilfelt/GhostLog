@@ -25,4 +25,8 @@ public class EventBus {
     public static class ClearLogEvent {
 
     }
+
+    public static class ShareLogEvent {
+
+    }
 }

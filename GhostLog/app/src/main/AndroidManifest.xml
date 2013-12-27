@@ -21,7 +21,7 @@
         </activity>
 
         <service
-            android:name="com.readystatesoftware.ghostlog.LogWindowService"
+            android:name="com.readystatesoftware.ghostlog.LogService"
             android:enabled="true"
             android:exported="false" >
         </service>

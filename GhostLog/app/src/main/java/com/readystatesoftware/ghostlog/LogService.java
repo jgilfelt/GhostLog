@@ -15,17 +15,19 @@ import android.widget.TextView;
 
 import com.squareup.otto.Subscribe;
 
-public class LogWindowService extends Service {
+public class LogService extends Service {
 
-    private static final String TAG = "LogWindowService";
+    private static final String TAG = "LogService";
     private static final int NOTIFICATION_ID = 1138;
 
     private static boolean sIsRunning = false;
 
+    private boolean mIsLogPaused = false;
+
     private NotificationManager mNotificationManager;
     private TextView mTestView;
 
-    public LogWindowService() {
+    public LogService() {
     }
 
     @Override
@@ -35,16 +37,47 @@ public class LogWindowService extends Service {
         EventBus.getInstance().register(this);
     }
 
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        sIsRunning = true;
+        createSystemWindow();
+        showNotification();
+        return Service.START_NOT_STICKY;
+    }
+
+    @Override
+    public IBinder onBind(Intent intent) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        sIsRunning = false;
+        removeSytemWindow();
+        removeNotification();
+        EventBus.getInstance().unregister(this);
+    }
+
     private void showNotification() {
 
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.ic_launcher)
                 .setOngoing(true)
-                .setContentTitle("GhostLog Active")
+                .setContentTitle(getString(R.string.notification_title))
                 .setContentText("Blah blah blah...")
-                .setContentIntent(getNotificationIntent(null))
-                .addAction(0, "Pause", getNotificationIntent(LogReceiver.ACTION_PAUSE))
-                .addAction (0, "Clear", getNotificationIntent(LogReceiver.ACTION_CLEAR));
+                .setContentIntent(getNotificationIntent(null));
+        if (mIsLogPaused) {
+            mBuilder.addAction(R.drawable.ic_action_play, getString(R.string.play),
+                    getNotificationIntent(LogReceiver.ACTION_PLAY));
+        } else {
+            mBuilder.addAction(R.drawable.ic_action_pause, getString(R.string.pause),
+                    getNotificationIntent(LogReceiver.ACTION_PAUSE));
+        }
+        mBuilder.addAction(R.drawable.ic_action_clear, getString(R.string.clear),
+                getNotificationIntent(LogReceiver.ACTION_CLEAR))
+                .addAction (R.drawable.ic_action_share, getString(R.string.share),
+                        getNotificationIntent(LogReceiver.ACTION_SHARE));
 
         // issue the notification
         mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
@@ -97,11 +130,15 @@ public class LogWindowService extends Service {
     @Subscribe
     public void onPlayLog(EventBus.PlayLogEvent event) {
         Log.d(TAG, "onPlayLog");
+        mIsLogPaused = false;
+        showNotification();
     }
 
     @Subscribe
     public void onPauseLog(EventBus.PauseLogEvent event) {
         Log.d(TAG, "onPauseLog");
+        mIsLogPaused = true;
+        showNotification();
     }
 
     @Subscribe
@@ -109,27 +146,9 @@ public class LogWindowService extends Service {
         Log.d(TAG, "onClearLog");
     }
 
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        sIsRunning = true;
-        createSystemWindow();
-        showNotification();
-        return Service.START_NOT_STICKY;
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        sIsRunning = false;
-        removeSytemWindow();
-        removeNotification();
-        EventBus.getInstance().unregister(this);
-    }
-
-    @Override
-    public IBinder onBind(Intent intent) {
-        // TODO: Return the communication channel to the service.
-        throw new UnsupportedOperationException("Not yet implemented");
+    @Subscribe
+    public void onShareLog(EventBus.ShareLogEvent event) {
+        Log.d(TAG, "onShareLog");
     }
 
     public static boolean isRunning() {

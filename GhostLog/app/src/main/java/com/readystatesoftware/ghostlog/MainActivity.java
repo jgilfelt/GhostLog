@@ -35,14 +35,14 @@ public class MainActivity extends PreferenceActivity {
         super.onCreate(savedInstanceState);
 
         mMainSwitch = new Switch(this);
-        mMainSwitch.setChecked(LogWindowService.isRunning());
+        mMainSwitch.setChecked(LogService.isRunning());
         mMainSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 // TODO
-                Intent intent = new Intent(MainActivity.this, LogWindowService.class);
+                Intent intent = new Intent(MainActivity.this, LogService.class);
                 if (b) {
-                    if (!LogWindowService.isRunning()) {
+                    if (!LogService.isRunning()) {
                         startService(intent);
                     }
                 } else {

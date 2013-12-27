@@ -27,9 +27,6 @@ import android.view.View;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 
-/**
- * @hide
- */
 public class SeekBarPreference extends Preference
         implements OnSeekBarChangeListener {
 
