@@ -28,4 +28,8 @@
         <item>Assert</item>
     </string-array>
 
+
+    <string name="toast_no_root">Could not obtain root.</string>
+    <string name="toast_request_root">GhostLog requires root (superuser) access to read logs.</string>
+
 </resources>
