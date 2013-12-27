@@ -6,26 +6,36 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.PixelFormat;
+import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.TextView;
+import android.widget.ListView;
 
 import com.squareup.otto.Subscribe;
+
+import java.util.LinkedList;
 
 public class LogService extends Service {
 
     private static final String TAG = "LogService";
+
     private static final int NOTIFICATION_ID = 1138;
+    private static final int LOG_BUFFER_LIMIT = 1000;
 
     private static boolean sIsRunning = false;
 
     private boolean mIsLogPaused = false;
 
     private NotificationManager mNotificationManager;
-    private TextView mTestView;
+    private ListView mLogListView;
+    private LogAdapter mAdapter;
+    private LinkedList<LogLine> mLogBuffer;
+    private Handler mLogBufferUpdateHandler = new Handler();
+    private LogReaderAsyncTask mLogReaderTask;
 
     public LogService() {
     }
@@ -42,21 +52,23 @@ public class LogService extends Service {
         sIsRunning = true;
         createSystemWindow();
         showNotification();
+        startLogReader();
         return Service.START_NOT_STICKY;
-    }
-
-    @Override
-    public IBinder onBind(Intent intent) {
-        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         sIsRunning = false;
-        removeSytemWindow();
+        stopLogReader();
+        removeSystemWindow();
         removeNotification();
         EventBus.getInstance().unregister(this);
+    }
+
+    @Override
+    public IBinder onBind(Intent intent) {
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     private void showNotification() {
@@ -94,26 +106,63 @@ public class LogService extends Service {
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY,
-                WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,
+                //WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN & WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS &
+                //WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,
+                0,
                 PixelFormat.TRANSLUCENT
         );
 
+        final LayoutInflater inflator = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         final WindowManager wm = (WindowManager) getSystemService(WINDOW_SERVICE);
-        mTestView = new TextView(this);
-        mTestView.setText("TEST");
-
-        wm.addView(mTestView, lp);
+        mLogListView = (ListView) inflator.inflate(R.layout.window_log, null);
+        mLogBuffer = new LinkedList<LogLine>();
+        mAdapter = new LogAdapter(this, mLogBuffer);
+        mLogListView.setAdapter(mAdapter);
+        wm.addView(mLogListView, lp);
     }
 
-    private void removeSytemWindow() {
+    private void removeSystemWindow() {
         try {
-            if(mTestView != null && mTestView.getParent() != null) {
+            if(mLogListView != null && mLogListView.getParent() != null) {
                 final WindowManager wm = (WindowManager) getSystemService(WINDOW_SERVICE);
-                wm.removeView(mTestView);
+                wm.removeView(mLogListView);
             }
         } catch (Exception e) {
             Log.e(TAG, "Remove window failed");
         }
+    }
+
+    private void startLogReader() {
+        mLogReaderTask = new LogReaderAsyncTask() {
+            @Override
+            protected void onProgressUpdate(LogLine... values) {
+                updateBuffer(values[0]);
+            }
+        };
+        mLogReaderTask.execute();
+        Log.d(TAG, "log reader task started");
+    }
+
+    private void stopLogReader() {
+        if (mLogReaderTask != null) {
+            mLogReaderTask.cancel(true);
+        }
+        mLogReaderTask = null;
+        Log.d(TAG, "log reader task stopped");
+    }
+
+    private void updateBuffer(final LogLine line) {
+        mLogBufferUpdateHandler.post( new Runnable() {
+            @Override
+            public void run() {
+                // TODO filters
+                mLogBuffer.add(line);
+                mAdapter.setData(mLogBuffer);
+                while(mLogBuffer.size() > LOG_BUFFER_LIMIT) {
+                    mLogBuffer.remove();
+                }
+            }
+        });
     }
 
     private PendingIntent getNotificationIntent(String action) {

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/time"
+        android:layout_width="90dp"
+        android:layout_height="wrap_content"
+        android:lines="1"
+        android:ellipsize="end"
+        android:typeface="monospace"
+        android:textSize="8dp"
+        android:layout_marginLeft="2dp"
+        android:layout_marginRight="2dp"/>
+
+    <TextView
+        android:id="@+id/tag"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:lines="1"
+        android:ellipsize="end"
+        android:typeface="monospace"
+        android:textSize="8dp"
+        android:layout_marginRight="2dp"/>
+
+    <TextView
+        android:id="@+id/msg"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:typeface="monospace"
+        android:textSize="8dp"
+        android:layout_marginRight="2dp"/>
+</LinearLayout>
