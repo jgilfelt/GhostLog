@@ -1,5 +1,6 @@
 package com.readystatesoftware.ghostlog;
 
+import android.app.ActionBar;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -9,10 +10,16 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
+import android.view.Gravity;
+import android.view.ViewGroup;
+import android.widget.CompoundButton;
+import android.widget.Switch;
 
 import java.util.List;
 
 public class MainActivity extends PreferenceActivity {
+
+    private Switch mMainSwitch;
 
     /**
      * Determines whether to always show the simplified settings UI, where
@@ -21,6 +28,26 @@ public class MainActivity extends PreferenceActivity {
      * shown on tablets.
      */
     private static final boolean ALWAYS_SIMPLE_PREFS = false;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        mMainSwitch = new Switch(this);
+        mMainSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                // TODO
+            }
+        });
+
+        final ActionBar bar = getActionBar();
+        final ActionBar.LayoutParams lp = new ActionBar.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        lp.gravity = Gravity.RIGHT | Gravity.CENTER_VERTICAL;
+        lp.rightMargin = getResources().getDimensionPixelSize(R.dimen.main_switch_margin_right);
+        bar.setCustomView(mMainSwitch, lp);
+        bar.setDisplayShowCustomEnabled(true);
+    }
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
