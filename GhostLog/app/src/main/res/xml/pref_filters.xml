@@ -1,21 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res/com.readystatesoftware.ghostlog">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-	<SwitchPreference
-        android:defaultValue="false"
-        android:key="pref_auto_filter"
-        android:summary="zzz"
-        android:title="Auto Filter" />
     <ListPreference
         android:defaultValue="0"
         android:dialogTitle="Level"
         android:entries="@array/levels_entries"
         android:entryValues="@array/levels_values"
-        android:key="pref_level"
-        android:title="Level" />
-    <com.readystatesoftware.ghostlog.SeekBarPreference
-        android:key="pref_opacity"
-        app:max="100"
-        android:title="Opacity" />
+        android:key="@string/pref_log_level"
+        android:title="@string/log_level" />
+	<SwitchPreference
+        android:defaultValue="false"
+        android:key="@string/pref_auto_filter"
+        android:title="@string/auto_filter"
+        android:summary="@string/auto_filter_summary"/>
+    <PreferenceScreen
+        android:key="@string/pref_screen_tag_filter"
+        android:title="@string/tag_filter"
+        android:summary="@string/none">
+    </PreferenceScreen>
+
 </PreferenceScreen>

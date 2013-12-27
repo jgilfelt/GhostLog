@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res/com.readystatesoftware.ghostlog">
+
+    <com.readystatesoftware.ghostlog.SeekBarPreference
+        android:key="@string/pref_text_size"
+        app:max="8"
+        android:defaultValue="2"
+        android:title="@string/text_size" />
+
+    <com.readystatesoftware.ghostlog.SeekBarPreference
+        android:key="@string/pref_text_opacity"
+        app:max="100"
+        android:defaultValue="50"
+        android:title="@string/text_opacity" />
+
+    <com.readystatesoftware.ghostlog.SeekBarPreference
+        android:key="@string/pref_bg_opacity"
+        app:max="100"
+        android:defaultValue="50"
+        android:title="@string/background_opacity" />
+
+</PreferenceScreen>

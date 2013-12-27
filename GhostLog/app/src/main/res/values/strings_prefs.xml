@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="pref_auto_filter">pref_auto_filter</string>
+    <string name="pref_log_level">pref_log_level</string>
+    <string name="pref_tag_filter">pref_tag_filter</string>
+    <string name="pref_text_opacity">pref_text_opacity</string>
+    <string name="pref_bg_opacity">pref_bg_opacity</string>
+    <string name="pref_text_size">pref_text_size</string>
+    <string name="pref_screen_tag_filter">pref_screen_tag_filter</string>
+
+    <string-array name="levels_entries">
+        <item>Verbose</item>
+        <item>Debug</item>
+        <item>Info</item>
+        <item>Warn</item>
+        <item>Error</item>
+        <item>Assert</item>
+    </string-array>
+
+    <string-array name="levels_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+    </string-array>
+
+</resources>

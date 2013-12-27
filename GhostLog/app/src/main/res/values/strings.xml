@@ -2,18 +2,16 @@
 <resources>
 
     <string name="app_name">GhostLog</string>
-    <string name="action_settings">Settings</string>
     <string name="appearance">Appearance</string>
     <string name="filters">Filters</string>
+    <string name="text_opacity">Text Opacity</string>
+    <string name="background_opacity">Background Opacity</string>
+    <string name="text_size">Text Size</string>
+    <string name="auto_filter">Auto Filter</string>
+    <string name="auto_filter_summary">Log foreground process only</string>
+    <string name="log_level">Log Level</string>
+    <string name="tag_filter">Tag Filter</string>
+    <string name="none">None</string>
 
-    <string-array name="levels_entries">
-        <item>Verbose</item>
-        <item>Debug</item>
-    </string-array>
-
-    <string-array name="levels_values">
-        <item>0</item>
-        <item>1</item>
-    </string-array>
 
 </resources>

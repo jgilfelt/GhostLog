@@ -2,10 +2,10 @@
 <preference-headers xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <header
-        android:fragment="com.readystatesoftware.ghostlog.MainActivity$PlaceholderFragment"
+        android:fragment="com.readystatesoftware.ghostlog.MainActivity$FilterPreferenceFragment"
         android:title="@string/filters" />
     <header
-        android:fragment="com.readystatesoftware.ghostlog.MainActivity$PlaceholderFragment"
+        android:fragment="com.readystatesoftware.ghostlog.MainActivity$AppearancePreferenceFragment"
         android:title="@string/appearance" />
 
 </preference-headers>
