@@ -81,7 +81,8 @@ public class MainActivity extends PreferenceActivity {
      * example, 10" tablets are extra-large.
      */
     private static boolean isXLargeTablet(Context context) {
-        return (context.getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_XLARGE;
+        return (context.getResources().getConfiguration().screenLayout &
+                Configuration.SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_XLARGE;
     }
 
     /**
@@ -94,6 +95,5 @@ public class MainActivity extends PreferenceActivity {
     private static boolean isSimplePreferences(Context context) {
         return ALWAYS_SIMPLE_PREFS || !isXLargeTablet(context);
     }
-
 
 }
