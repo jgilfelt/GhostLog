@@ -13,7 +13,7 @@
     <string name="tag_filter">Tag Filter</string>
     <string name="none">None</string>
 
-    <string name="notification_title">GhostLog Active</string>
+    <string name="notification_title">Log service is active</string>
     <string name="play">Play</string>
     <string name="pause">Pause</string>
     <string name="clear">Clear</string>

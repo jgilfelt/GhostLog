@@ -1,5 +1,6 @@
 package com.readystatesoftware.ghostlog;
 
+import android.content.Context;
 import android.graphics.Color;
 
 public class LogLine {
@@ -114,6 +115,17 @@ public class LogLine {
         } else {
             return Color.parseColor("#EEEEEE");
         }
+    }
+
+    public static String getLevelName(Context context, String code) {
+        String[] codes = context.getResources().getStringArray(R.array.levels_values);
+        String[] names = context.getResources().getStringArray(R.array.levels_entries);
+        for (int i = 0; i < codes.length; i++) {
+            if (codes[i].equals(code)) {
+                return names[i];
+            }
+        }
+        return null;
     }
 
 }

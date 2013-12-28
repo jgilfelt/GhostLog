@@ -29,7 +29,7 @@ public class LogService extends Service implements SharedPreferences.OnSharedPre
     private static final String TAG = "LogService";
 
     private static final int NOTIFICATION_ID = 1138;
-    private static final int LOG_BUFFER_LIMIT = 500;
+    private static final int LOG_BUFFER_LIMIT = 2000;
 
     private static boolean sIsRunning = false;
 
@@ -37,6 +37,7 @@ public class LogService extends Service implements SharedPreferences.OnSharedPre
     private String mLogLevel;
     private boolean mAutoFilter;
     private int mForegroundAppPid;
+    private String mForegroundAppPkg;
     private NotificationManager mNotificationManager;
     private ActivityManager mActivityManager;
     private SharedPreferences mPrefs;
@@ -94,11 +95,30 @@ public class LogService extends Service implements SharedPreferences.OnSharedPre
 
     private void showNotification() {
 
+        String level = LogLine.getLevelName(this, mLogLevel);
+        String smallText = "";
+        String bigText = "";
+
+        if (mAutoFilter && mForegroundAppPkg != null) {
+            smallText += mForegroundAppPkg + "/";
+            bigText += getString(R.string.auto_filter) + ": " + mForegroundAppPkg + "\n";
+        } else {
+            bigText += getString(R.string.auto_filter) + ": OFF\n";
+        }
+        smallText += level;
+        bigText += getString(R.string.log_level) + ": " + level + "\n";
+
+        // TODO
+        smallText += "/None";
+        bigText += getString(R.string.tag_filter) + ": None\n";
+
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
-                .setSmallIcon(R.drawable.ic_launcher)
+                .setStyle(new NotificationCompat.BigTextStyle()
+                    .bigText(bigText))
+                .setSmallIcon(R.drawable.ic_stat_ghost)
                 .setOngoing(true)
                 .setContentTitle(getString(R.string.notification_title))
-                .setContentText("Blah blah blah...")
+                .setContentText(smallText)
                 .setContentIntent(getNotificationIntent(null));
         if (mIsLogPaused) {
             mBuilder.addAction(R.drawable.ic_action_play, getString(R.string.play),
@@ -160,10 +180,17 @@ public class LogService extends Service implements SharedPreferences.OnSharedPre
         mLogBufferFiltered = new LinkedList<LogLine>();
         mLogReaderTask = new LogReaderAsyncTask() {
             @Override
-            protected void onProgressUpdate(Pair<LogLine, Integer>... values) {
-                // TODO ???
-                mForegroundAppPid = values[0].second;
-                updateBuffer(values[0].first);
+            protected void onProgressUpdate(LogUpdate... values) {
+                boolean change = false;
+                if (values[0].foregroundPid != mForegroundAppPid) {
+                    change = true;
+                }
+                mForegroundAppPkg = values[0].foregroundPkg;
+                mForegroundAppPid = values[0].foregroundPid;
+                updateBuffer(values[0].line);
+                if (change) {
+                    showNotification();
+                }
             }
         };
         mLogReaderTask.execute(mActivityManager);
@@ -288,9 +315,11 @@ public class LogService extends Service implements SharedPreferences.OnSharedPre
             setSystemViewBackground();
         } else if (key.equals(getString(R.string.pref_log_level))) {
             mLogLevel = mPrefs.getString(getString(R.string.pref_log_level), LogLine.LEVEL_VERBOSE);
+            showNotification();
             updateBuffer();
         } else if (key.equals(getString(R.string.pref_auto_filter))) {
             mAutoFilter = mPrefs.getBoolean(getString(R.string.pref_auto_filter), false);
+            showNotification();
             updateBuffer();
         }
     }

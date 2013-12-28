@@ -12,7 +12,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.List;
 
-public class LogReaderAsyncTask extends AsyncTask<ActivityManager, Pair<LogLine, Integer>, Void> {
+public class LogReaderAsyncTask extends AsyncTask<ActivityManager, LogReaderAsyncTask.LogUpdate, Void> {
 
     private static final String TAG = "LogReaderAsyncTask";
 
@@ -48,11 +48,13 @@ public class LogReaderAsyncTask extends AsyncTask<ActivityManager, Pair<LogLine,
                     continue;
                 }
 
+                // TODO wait till our reader is blocking before publishing - might want to maintain
+                // a small buffer of lines here for startup
                 if (!reader.ready()) {
                     // publish result
-                    final int pid = getForegroundPid(ams[0]);
-                    final Pair<LogLine, Integer> p = new Pair<LogLine, Integer>(new LogLine(line), pid);
-                    publishProgress(p);
+                    final Pair<Integer, String> p = getForegroundApp(ams[0]);
+                    final LogUpdate update = new LogUpdate(new LogLine(line), p.first, p.second);
+                    publishProgress(update);
                 }
             }
 
@@ -87,7 +89,8 @@ public class LogReaderAsyncTask extends AsyncTask<ActivityManager, Pair<LogLine,
         return null;
     }
 
-    private int getForegroundPid(ActivityManager am) {
+    private Pair<Integer, String> getForegroundApp(ActivityManager am) {
+
         final ActivityManager.RunningTaskInfo foregroundTaskInfo = am.getRunningTasks(1).get(0);
         final String pkg = foregroundTaskInfo.topActivity.getPackageName();
 
@@ -100,12 +103,25 @@ public class LogReaderAsyncTask extends AsyncTask<ActivityManager, Pair<LogLine,
                             mPidCache = appProcess.pid;
                             Log.i(TAG, "new foreground pid = " + mPidCache);
                         }
-                        return appProcess.pid;
+                        return new Pair<Integer, String>(appProcess.pid, pkg);
                     }
                 }
             }
         }
-        return 0;
+        return new Pair<Integer, String>(0, pkg);
+
+    }
+
+    public static class LogUpdate {
+        public LogLine line;
+        public int foregroundPid;
+        public String foregroundPkg;
+
+        public LogUpdate(LogLine line, int foregroundPid, String foregroundPkg) {
+            this.line = line;
+            this.foregroundPid = foregroundPid;
+            this.foregroundPkg = foregroundPkg;
+        }
     }
 
 }
