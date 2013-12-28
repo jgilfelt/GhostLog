@@ -20,6 +20,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name="com.readystatesoftware.ghostlog.ShareActivity"/>
 
         <service
             android:name="com.readystatesoftware.ghostlog.LogService"

@@ -13,8 +13,8 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
+import android.text.format.Time;
 import android.util.Log;
-import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -274,6 +274,9 @@ public class LogService extends Service implements SharedPreferences.OnSharedPre
         if (action == null) {
             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
             return PendingIntent.getActivity(getApplicationContext(), 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+        } else if (action == LogReceiver.ACTION_SHARE) {
+            Intent intent = new Intent(getApplicationContext(), ShareActivity.class);
+            return PendingIntent.getActivity(getApplicationContext(), 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
         } else {
             Intent intent = new Intent(getApplicationContext(), LogReceiver.class);
             intent.setAction(action);
@@ -302,8 +305,21 @@ public class LogService extends Service implements SharedPreferences.OnSharedPre
 
     @Subscribe
     public void onShareLog(EventBus.ShareLogEvent event) {
-        Log.d(TAG, "onShareLog");
-        // TODO
+        StringBuffer sb = new StringBuffer();
+        for (LogLine line : mLogBufferFiltered) {
+            sb.append(line.getRaw());
+            sb.append("\n");
+        }
+        Time now = new Time();
+        now.setToNow();
+        String ts = now.format3339(false);
+
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.setType("text/plain");
+        shareIntent.putExtra(Intent.EXTRA_TEXT, sb.toString());
+        shareIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.share_subject) + " " + ts);
+        shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(shareIntent);
     }
 
     @Override

@@ -20,6 +20,8 @@ public class LogLine {
     private static final String LEVEL_ERROR = "E";
     private static final String LEVEL_ASSERT = "A";
 
+    private String mRaw;
+
     private String mDate;
     private String mTime;
     private String mLevel;
@@ -29,6 +31,8 @@ public class LogLine {
     private String mMessage;
 
     public LogLine(String raw) {
+
+        mRaw = raw;
 
         String[] parts = raw.split(":? +");
         mMessage = "";
@@ -69,6 +73,10 @@ public class LogLine {
 
         }
 
+    }
+
+    public String getRaw() {
+        return mRaw;
     }
 
     public String getDate() {

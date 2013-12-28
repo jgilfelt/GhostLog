@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">GhostLog</string>
+    <string name="app_name">Ghost Log</string>
     <string name="appearance">Appearance</string>
     <string name="filters">Filters</string>
     <string name="text_opacity">Text Opacity</string>
@@ -19,6 +19,8 @@
     <string name="clear">Clear</string>
     <string name="share">Share</string>
 
+    <string name="share_subject">LogCat Output</string>
+
     <string-array name="levels_entries">
         <item>Verbose</item>
         <item>Debug</item>
@@ -30,6 +32,6 @@
 
 
     <string name="toast_no_root">Could not obtain root.</string>
-    <string name="toast_request_root">GhostLog requires root (superuser) access to read logs.</string>
+    <string name="toast_request_root">Ghost Log requires root (superuser) access to read logs.</string>
 
 </resources>

@@ -24,7 +24,7 @@ public class LogReceiver extends BroadcastReceiver {
         } else if (ACTION_CLEAR.equals(action)) {
             EventBus.getInstance().post(new EventBus.ClearLogEvent());
         } else if (ACTION_SHARE.equals(action)) {
-            EventBus.getInstance().post(new EventBus.ShareLogEvent());
+            // never called - see ShareActivity
         }
     }
 }
