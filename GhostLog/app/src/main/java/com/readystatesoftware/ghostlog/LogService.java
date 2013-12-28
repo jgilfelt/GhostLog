@@ -1,5 +1,6 @@
 package com.readystatesoftware.ghostlog;
 
+import android.app.ActivityManager;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -13,6 +14,7 @@ import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -33,11 +35,15 @@ public class LogService extends Service implements SharedPreferences.OnSharedPre
 
     private boolean mIsLogPaused = false;
     private String mLogLevel;
+    private boolean mAutoFilter;
+    private int mForegroundAppPid;
     private NotificationManager mNotificationManager;
+    private ActivityManager mActivityManager;
     private SharedPreferences mPrefs;
     private ListView mLogListView;
     private LogAdapter mAdapter;
     private LinkedList<LogLine> mLogBuffer;
+    private LinkedList<LogLine> mLogBufferFiltered;
     private Handler mLogBufferUpdateHandler = new Handler();
     private LogReaderAsyncTask mLogReaderTask;
 
@@ -52,10 +58,12 @@ public class LogService extends Service implements SharedPreferences.OnSharedPre
     @Override
     public void onCreate() {
         super.onCreate();
-        mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        mActivityManager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
         mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         mPrefs.registerOnSharedPreferenceChangeListener(this);
         mLogLevel = mPrefs.getString(getString(R.string.pref_log_level), LogLine.LEVEL_VERBOSE);
+        mAutoFilter = mPrefs.getBoolean(getString(R.string.pref_auto_filter), false);
         EventBus.getInstance().register(this);
     }
 
@@ -130,7 +138,8 @@ public class LogService extends Service implements SharedPreferences.OnSharedPre
         mLogListView = (ListView) inflator.inflate(R.layout.window_log, null);
         setSystemViewBackground();
         mLogBuffer = new LinkedList<LogLine>();
-        mAdapter = new LogAdapter(this, mLogBuffer);
+        mLogBufferFiltered = new LinkedList<LogLine>();
+        mAdapter = new LogAdapter(this, mLogBufferFiltered);
         mLogListView.setAdapter(mAdapter);
         wm.addView(mLogListView, lp);
     }
@@ -148,13 +157,16 @@ public class LogService extends Service implements SharedPreferences.OnSharedPre
 
     private void startLogReader() {
         mLogBuffer = new LinkedList<LogLine>();
+        mLogBufferFiltered = new LinkedList<LogLine>();
         mLogReaderTask = new LogReaderAsyncTask() {
             @Override
-            protected void onProgressUpdate(LogLine... values) {
-                updateBuffer(values[0]);
+            protected void onProgressUpdate(Pair<LogLine, Integer>... values) {
+                // TODO ???
+                mForegroundAppPid = values[0].second;
+                updateBuffer(values[0].first);
             }
         };
-        mLogReaderTask.execute();
+        mLogReaderTask.execute(mActivityManager);
         Log.d(TAG, "log reader task started");
     }
 
@@ -166,9 +178,8 @@ public class LogService extends Service implements SharedPreferences.OnSharedPre
         Log.d(TAG, "log reader task stopped");
     }
 
-    private void restartLogReader() {
-        stopLogReader();
-        startLogReader();
+    private void updateBuffer() {
+        updateBuffer(null);
     }
 
     private void updateBuffer(final LogLine line) {
@@ -177,25 +188,46 @@ public class LogService extends Service implements SharedPreferences.OnSharedPre
             public void run() {
 
                 if (line != null) {
-
-                    // TODO filters
-
-                    if (!LogLine.LEVEL_VERBOSE.equals(mLogLevel)) {
-                        if (line.getLevel() != null && !line.getLevel().equals(mLogLevel)) {
-                            return;
-                        }
-                    }
-
                     mLogBuffer.add(line);
                 }
+
+                mLogBufferFiltered.clear();
+                for (LogLine bufferedLine : mLogBuffer) {
+                    if (!isFiltered(bufferedLine)) {
+                        mLogBufferFiltered.add(bufferedLine);
+                    }
+                }
+
                 if (!mIsLogPaused) {
-                    mAdapter.setData(mLogBuffer);
+                    mAdapter.setData(mLogBufferFiltered);
                 }
                 while(mLogBuffer.size() > LOG_BUFFER_LIMIT) {
                     mLogBuffer.remove();
                 }
+
             }
         });
+    }
+
+    private boolean isFiltered(LogLine line) {
+
+        if (line != null) {
+            // TODO tag filter
+            if (mAutoFilter && mForegroundAppPid != 0) {
+                if (line.getPid() != mForegroundAppPid) {
+                    return true;
+                }
+            }
+            if (!LogLine.LEVEL_VERBOSE.equals(mLogLevel)) {
+                if (line.getLevel() != null && !line.getLevel().equals(mLogLevel)) {
+                    return true;
+                }
+            }
+            return false;
+        } else {
+            return true;
+        }
+
     }
 
     private void setSystemViewBackground() {
@@ -253,7 +285,10 @@ public class LogService extends Service implements SharedPreferences.OnSharedPre
             setSystemViewBackground();
         } else if (key.equals(getString(R.string.pref_log_level))) {
             mLogLevel = mPrefs.getString(getString(R.string.pref_log_level), LogLine.LEVEL_VERBOSE);
-            restartLogReader();
+            updateBuffer();
+        } else if (key.equals(getString(R.string.pref_auto_filter))) {
+            mAutoFilter = mPrefs.getBoolean(getString(R.string.pref_auto_filter), false);
+            updateBuffer();
         }
     }
 }

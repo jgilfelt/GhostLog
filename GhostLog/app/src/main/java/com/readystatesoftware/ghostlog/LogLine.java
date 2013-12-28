@@ -7,7 +7,7 @@ public class LogLine {
     private static final int DATE_INDEX = 0;
     private static final int TIME_INDEX = 1;
     private static final int PID_INDEX = 2;
-    private static final int PKG_INDEX = 3;
+    private static final int TID_INDEX = 3;
     private static final int LEVEL_INDEX = 4;
     private static final int TAG_INDEX = 5;
     private static final int MSG_INDEX = 6;
@@ -22,8 +22,8 @@ public class LogLine {
     private String mDate;
     private String mTime;
     private String mLevel;
-    private String mPackage;
     private int mPid;
+    private int mTid;
     private String mTag;
     private String mMessage;
 
@@ -43,11 +43,19 @@ public class LogLine {
                 case LEVEL_INDEX:
                     mLevel = part;
                     break;
-                case PKG_INDEX:
-                    mPackage = part;
+                case TID_INDEX:
+                    try {
+                        mTid = Integer.parseInt(part.trim());
+                    } catch (NumberFormatException e) {
+                        mTid = 0;
+                    }
                     break;
                 case PID_INDEX:
-                    mPid = 0;
+                    try {
+                        mPid = Integer.parseInt(part.trim());
+                    } catch (NumberFormatException e) {
+                        mPid = 0;
+                    }
                     break;
                 case TAG_INDEX:
                     mTag = part;
@@ -78,12 +86,12 @@ public class LogLine {
         return mPid;
     }
 
-    public String getTag() {
-        return mTag;
+    public int getTid() {
+        return mTid;
     }
 
-    public String getPackage() {
-        return mPackage;
+    public String getTag() {
+        return mTag;
     }
 
     public String getMessage() {
