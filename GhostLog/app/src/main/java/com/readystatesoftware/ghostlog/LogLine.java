@@ -94,7 +94,7 @@ public class LogLine {
         if(LEVEL_VERBOSE.equals(mLevel)) {
             return Color.parseColor("#EEEEEE");
         } else if(LEVEL_DEBUG.equals(mLevel)) {
-            return Color.parseColor("#4D4DFF");
+            return Color.parseColor("#0099CC");
         } else if(LEVEL_INFO.equals(mLevel)) {
             return Color.parseColor("#5BBD00");
         } else if(LEVEL_WARN.equals(mLevel)) {

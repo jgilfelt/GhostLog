@@ -7,31 +7,29 @@
 
     <TextView
         android:id="@+id/time"
+        style="@style/LogText"
         android:layout_width="90dp"
         android:layout_height="wrap_content"
         android:lines="1"
         android:ellipsize="end"
-        android:typeface="monospace"
-        android:textSize="8dp"
         android:layout_marginLeft="2dp"
         android:layout_marginRight="2dp"/>
 
     <TextView
         android:id="@+id/tag"
+        style="@style/LogText"
         android:layout_width="80dp"
         android:layout_height="wrap_content"
         android:lines="1"
         android:ellipsize="end"
-        android:typeface="monospace"
-        android:textSize="8dp"
         android:layout_marginRight="2dp"/>
 
     <TextView
         android:id="@+id/msg"
+        style="@style/LogText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:typeface="monospace"
-        android:textSize="8dp"
         android:layout_marginRight="2dp"/>
+
 </LinearLayout>
