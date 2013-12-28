@@ -29,7 +29,7 @@ public class LogService extends Service implements SharedPreferences.OnSharedPre
     private static final String TAG = "LogService";
 
     private static final int NOTIFICATION_ID = 1138;
-    private static final int LOG_BUFFER_LIMIT = 1000;
+    private static final int LOG_BUFFER_LIMIT = 500;
 
     private static boolean sIsRunning = false;
 
@@ -187,10 +187,12 @@ public class LogService extends Service implements SharedPreferences.OnSharedPre
             @Override
             public void run() {
 
+                // update raw buffer
                 if (line != null) {
                     mLogBuffer.add(line);
                 }
 
+                // update filtered buffer
                 mLogBufferFiltered.clear();
                 for (LogLine bufferedLine : mLogBuffer) {
                     if (!isFiltered(bufferedLine)) {
@@ -198,9 +200,12 @@ public class LogService extends Service implements SharedPreferences.OnSharedPre
                     }
                 }
 
+                // update adapter
                 if (!mIsLogPaused) {
                     mAdapter.setData(mLogBufferFiltered);
                 }
+
+                // purge old entries
                 while(mLogBuffer.size() > LOG_BUFFER_LIMIT) {
                     mLogBuffer.remove();
                 }
@@ -210,7 +215,6 @@ public class LogService extends Service implements SharedPreferences.OnSharedPre
     }
 
     private boolean isFiltered(LogLine line) {
-
         if (line != null) {
             // TODO tag filter
             if (mAutoFilter && mForegroundAppPid != 0) {
@@ -227,7 +231,6 @@ public class LogService extends Service implements SharedPreferences.OnSharedPre
         } else {
             return true;
         }
-
     }
 
     private void setSystemViewBackground() {
