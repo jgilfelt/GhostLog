@@ -2,7 +2,7 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <ListPreference
-        android:defaultValue="0"
+        android:defaultValue="V"
         android:dialogTitle="@string/log_level"
         android:entries="@array/levels_entries"
         android:entryValues="@array/levels_values"

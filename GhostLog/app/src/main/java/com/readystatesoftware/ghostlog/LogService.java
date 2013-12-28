@@ -5,9 +5,12 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.os.Handler;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,7 +22,7 @@ import com.squareup.otto.Subscribe;
 
 import java.util.LinkedList;
 
-public class LogService extends Service {
+public class LogService extends Service implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     private static final String TAG = "LogService";
 
@@ -31,6 +34,7 @@ public class LogService extends Service {
     private boolean mIsLogPaused = false;
 
     private NotificationManager mNotificationManager;
+    private SharedPreferences mPrefs;
     private ListView mLogListView;
     private LogAdapter mAdapter;
     private LinkedList<LogLine> mLogBuffer;
@@ -44,6 +48,10 @@ public class LogService extends Service {
     public void onCreate() {
         super.onCreate();
         mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        mPrefs.registerOnSharedPreferenceChangeListener(this);
+
         EventBus.getInstance().register(this);
     }
 
@@ -60,6 +68,7 @@ public class LogService extends Service {
     public void onDestroy() {
         super.onDestroy();
         sIsRunning = false;
+        mPrefs.unregisterOnSharedPreferenceChangeListener(this);
         stopLogReader();
         removeSystemWindow();
         removeNotification();
@@ -115,6 +124,7 @@ public class LogService extends Service {
         final LayoutInflater inflator = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         final WindowManager wm = (WindowManager) getSystemService(WINDOW_SERVICE);
         mLogListView = (ListView) inflator.inflate(R.layout.window_log, null);
+        setSystemViewBackground();
         mLogBuffer = new LinkedList<LogLine>();
         mAdapter = new LogAdapter(this, mLogBuffer);
         mLogListView.setAdapter(mAdapter);
@@ -165,6 +175,16 @@ public class LogService extends Service {
         });
     }
 
+    private void setSystemViewBackground() {
+        int v = mPrefs.getInt(getString(R.string.pref_bg_opacity), 0);
+        if (v > 0) {
+            int a = (int) ((float)v/100f * 255);
+            mLogListView.setBackgroundColor(Color.argb(a, 0, 0, 0));
+        } else {
+            mLogListView.setBackgroundColor(0);
+        }
+    }
+
     private PendingIntent getNotificationIntent(String action) {
         if (action == null) {
             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
@@ -202,5 +222,16 @@ public class LogService extends Service {
 
     public static boolean isRunning() {
         return sIsRunning;
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        Log.w(TAG, key + " changed!");
+        if (mAdapter != null) {
+            mAdapter.updateAppearance();
+        }
+        if (key.equals(getString(R.string.pref_bg_opacity))) {
+            setSystemViewBackground();
+        }
     }
 }

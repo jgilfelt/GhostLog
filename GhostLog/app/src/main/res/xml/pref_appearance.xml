@@ -5,20 +5,20 @@
 
     <com.readystatesoftware.ghostlog.SeekBarPreference
         android:key="@string/pref_text_size"
-        app:max="8"
+        app:max="6"
         android:defaultValue="2"
         android:title="@string/text_size" />
 
     <com.readystatesoftware.ghostlog.SeekBarPreference
         android:key="@string/pref_text_opacity"
-        app:max="100"
-        android:defaultValue="50"
+        app:max="70"
+        android:defaultValue="70"
         android:title="@string/text_opacity" />
 
     <com.readystatesoftware.ghostlog.SeekBarPreference
         android:key="@string/pref_bg_opacity"
-        app:max="100"
-        android:defaultValue="50"
+        app:max="70"
+        android:defaultValue="0"
         android:title="@string/background_opacity" />
 
 </PreferenceScreen>

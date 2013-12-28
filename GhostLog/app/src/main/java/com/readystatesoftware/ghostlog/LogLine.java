@@ -49,7 +49,7 @@ public class LogLine {
                     break;
                 default:
                     if (i >= MSG_INDEX) {
-                        mMessage += (part + ((i == parts.length-1) ? "" :" "));
+                        mMessage += (part + ((i == parts.length-1 || part.length() == 0) ? "" :" "));
                     }
             }
 
