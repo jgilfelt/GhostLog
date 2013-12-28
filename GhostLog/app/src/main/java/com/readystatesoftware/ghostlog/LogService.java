@@ -32,7 +32,7 @@ public class LogService extends Service implements SharedPreferences.OnSharedPre
     private static boolean sIsRunning = false;
 
     private boolean mIsLogPaused = false;
-
+    private String mLogLevel;
     private NotificationManager mNotificationManager;
     private SharedPreferences mPrefs;
     private ListView mLogListView;
@@ -41,17 +41,21 @@ public class LogService extends Service implements SharedPreferences.OnSharedPre
     private Handler mLogBufferUpdateHandler = new Handler();
     private LogReaderAsyncTask mLogReaderTask;
 
+    public static boolean isRunning() {
+        return sIsRunning;
+    }
+
     public LogService() {
+
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
         mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
         mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         mPrefs.registerOnSharedPreferenceChangeListener(this);
-
+        mLogLevel = mPrefs.getString(getString(R.string.pref_log_level), LogLine.LEVEL_VERBOSE);
         EventBus.getInstance().register(this);
     }
 
@@ -143,6 +147,7 @@ public class LogService extends Service implements SharedPreferences.OnSharedPre
     }
 
     private void startLogReader() {
+        mLogBuffer = new LinkedList<LogLine>();
         mLogReaderTask = new LogReaderAsyncTask() {
             @Override
             protected void onProgressUpdate(LogLine... values) {
@@ -161,13 +166,31 @@ public class LogService extends Service implements SharedPreferences.OnSharedPre
         Log.d(TAG, "log reader task stopped");
     }
 
+    private void restartLogReader() {
+        stopLogReader();
+        startLogReader();
+    }
+
     private void updateBuffer(final LogLine line) {
         mLogBufferUpdateHandler.post( new Runnable() {
             @Override
             public void run() {
-                // TODO filters
-                mLogBuffer.add(line);
-                mAdapter.setData(mLogBuffer);
+
+                if (line != null) {
+
+                    // TODO filters
+
+                    if (!LogLine.LEVEL_VERBOSE.equals(mLogLevel)) {
+                        if (line.getLevel() != null && !line.getLevel().equals(mLogLevel)) {
+                            return;
+                        }
+                    }
+
+                    mLogBuffer.add(line);
+                }
+                if (!mIsLogPaused) {
+                    mAdapter.setData(mLogBuffer);
+                }
                 while(mLogBuffer.size() > LOG_BUFFER_LIMIT) {
                     mLogBuffer.remove();
                 }
@@ -198,40 +221,39 @@ public class LogService extends Service implements SharedPreferences.OnSharedPre
 
     @Subscribe
     public void onPlayLog(EventBus.PlayLogEvent event) {
-        Log.d(TAG, "onPlayLog");
         mIsLogPaused = false;
+        updateBuffer(null);
         showNotification();
     }
 
     @Subscribe
     public void onPauseLog(EventBus.PauseLogEvent event) {
-        Log.d(TAG, "onPauseLog");
         mIsLogPaused = true;
         showNotification();
     }
 
     @Subscribe
     public void onClearLog(EventBus.ClearLogEvent event) {
-        Log.d(TAG, "onClearLog");
+        mLogBuffer = new LinkedList<LogLine>();
+        updateBuffer(null);
     }
 
     @Subscribe
     public void onShareLog(EventBus.ShareLogEvent event) {
         Log.d(TAG, "onShareLog");
-    }
-
-    public static boolean isRunning() {
-        return sIsRunning;
+        // TODO
     }
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        Log.w(TAG, key + " changed!");
         if (mAdapter != null) {
             mAdapter.updateAppearance();
         }
         if (key.equals(getString(R.string.pref_bg_opacity))) {
             setSystemViewBackground();
+        } else if (key.equals(getString(R.string.pref_log_level))) {
+            mLogLevel = mPrefs.getString(getString(R.string.pref_log_level), LogLine.LEVEL_VERBOSE);
+            restartLogReader();
         }
     }
 }

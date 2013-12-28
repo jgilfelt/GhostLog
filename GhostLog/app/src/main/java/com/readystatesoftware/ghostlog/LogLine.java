@@ -7,11 +7,12 @@ public class LogLine {
     private static final int DATE_INDEX = 0;
     private static final int TIME_INDEX = 1;
     private static final int PID_INDEX = 2;
+    private static final int PKG_INDEX = 3;
     private static final int LEVEL_INDEX = 4;
     private static final int TAG_INDEX = 5;
     private static final int MSG_INDEX = 6;
 
-    private static final String LEVEL_VERBOSE = "V";
+    public static final String LEVEL_VERBOSE = "V";
     private static final String LEVEL_DEBUG = "D";
     private static final String LEVEL_INFO = "I";
     private static final String LEVEL_WARN = "W";
@@ -21,6 +22,7 @@ public class LogLine {
     private String mDate;
     private String mTime;
     private String mLevel;
+    private String mPackage;
     private int mPid;
     private String mTag;
     private String mMessage;
@@ -40,6 +42,9 @@ public class LogLine {
                     break;
                 case LEVEL_INDEX:
                     mLevel = part;
+                    break;
+                case PKG_INDEX:
+                    mPackage = part;
                     break;
                 case PID_INDEX:
                     mPid = 0;
@@ -75,6 +80,10 @@ public class LogLine {
 
     public String getTag() {
         return mTag;
+    }
+
+    public String getPackage() {
+        return mPackage;
     }
 
     public String getMessage() {

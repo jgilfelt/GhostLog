@@ -6,5 +6,4 @@
     android:layout_height="match_parent"
     android:transcriptMode="alwaysScroll"
     android:scrollbars="none"
-    android:stackFromBottom="true"
     android:divider="@android:color/transparent" />
