@@ -10,12 +10,12 @@
     <string name="pref_screen_tag_filter">pref_screen_tag_filter</string>
 
     <string-array name="levels_values">
-        <item>0</item>
-        <item>1</item>
-        <item>2</item>
-        <item>3</item>
-        <item>4</item>
-        <item>5</item>
+        <item>V</item>
+        <item>D</item>
+        <item>I</item>
+        <item>W</item>
+        <item>E</item>
+        <item>A</item>
     </string-array>
 
 </resources>

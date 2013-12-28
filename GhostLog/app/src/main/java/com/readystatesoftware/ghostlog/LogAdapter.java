@@ -56,10 +56,15 @@ public class LogAdapter extends BaseAdapter {
         }
 
         final LogLine line = getItem(position);
+        final int color = line.getColor();
 
         holder.time.setText(line.getTime());
         holder.tag.setText(line.getTag());
         holder.msg.setText(line.getMessage());
+
+        holder.time.setTextColor(color);
+        holder.tag.setTextColor(color);
+        holder.msg.setTextColor(color);
 
         return convertView;
     }
