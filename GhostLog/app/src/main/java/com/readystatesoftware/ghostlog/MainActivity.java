@@ -22,7 +22,7 @@ import java.util.List;
 
 public class MainActivity extends PreferenceActivity {
 
-    private Switch mMainSwitch;
+
 
     /**
      * Determines whether to always show the simplified settings UI, where
@@ -33,6 +33,7 @@ public class MainActivity extends PreferenceActivity {
     private static final boolean ALWAYS_SIMPLE_PREFS = false;
     private static final int CODE_TAG_FILTER = 1;
 
+    private Switch mMainSwitch;
     private Preference mTagFilterPref;
 
     @Override
@@ -112,7 +113,7 @@ public class MainActivity extends PreferenceActivity {
         getPreferenceScreen().addPreference(fakeHeader);
         addPreferencesFromResource(R.xml.pref_filters);
         bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_log_level)));
-        bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_tag_filter)));
+        //bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_tag_filter)));
         setupTagFilterPreference(this, findPreference(getString(R.string.pref_tag_filter)));
         mTagFilterPref = findPreference(getString(R.string.pref_tag_filter));
 
@@ -125,6 +126,8 @@ public class MainActivity extends PreferenceActivity {
     }
 
     private static void setupTagFilterPreference(final Activity activity, Preference preference) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
+        preference.setSummary(prefs.getString(activity.getString(R.string.pref_tag_filter), activity.getString(R.string.none)));
         preference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
@@ -210,7 +213,7 @@ public class MainActivity extends PreferenceActivity {
             // Load the preferences from an XML resource
             addPreferencesFromResource(R.xml.pref_filters);
             bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_log_level)));
-            bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_tag_filter)));
+            //bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_tag_filter)));
             setupTagFilterPreference(getActivity(), findPreference(getString(R.string.pref_tag_filter)));
             mTagFilterPref = findPreference(getString(R.string.pref_tag_filter));
         }

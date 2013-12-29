@@ -16,7 +16,7 @@
     <Preference
         android:key="@string/pref_tag_filter"
         android:title="@string/tag_filter"
-        android:defaultValue="@string/none">
+        android:summary="@string/none">
     </Preference>
 
 </PreferenceScreen>

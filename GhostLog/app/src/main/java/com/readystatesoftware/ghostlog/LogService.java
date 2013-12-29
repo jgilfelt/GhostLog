@@ -38,6 +38,7 @@ public class LogService extends Service implements SharedPreferences.OnSharedPre
     private boolean mAutoFilter;
     private int mForegroundAppPid;
     private String mForegroundAppPkg;
+    private String mTagFilter;
     private NotificationManager mNotificationManager;
     private ActivityManager mActivityManager;
     private SharedPreferences mPrefs;
@@ -65,6 +66,7 @@ public class LogService extends Service implements SharedPreferences.OnSharedPre
         mPrefs.registerOnSharedPreferenceChangeListener(this);
         mLogLevel = mPrefs.getString(getString(R.string.pref_log_level), LogLine.LEVEL_VERBOSE);
         mAutoFilter = mPrefs.getBoolean(getString(R.string.pref_auto_filter), false);
+        mTagFilter = mPrefs.getString(getString(R.string.pref_tag_filter), null);
         EventBus.getInstance().register(this);
     }
 
@@ -96,6 +98,7 @@ public class LogService extends Service implements SharedPreferences.OnSharedPre
     private void showNotification() {
 
         String level = LogLine.getLevelName(this, mLogLevel);
+        String tag = (mTagFilter == null) ? getString(R.string.none) : mTagFilter;
         String smallText = "";
         String bigText = "";
 
@@ -108,9 +111,8 @@ public class LogService extends Service implements SharedPreferences.OnSharedPre
         smallText += level;
         bigText += getString(R.string.log_level) + ": " + level + "\n";
 
-        // TODO
-        smallText += "/None";
-        bigText += getString(R.string.tag_filter) + ": None\n";
+        smallText += "/" + tag;
+        bigText += getString(R.string.tag_filter) + ": " + tag + "\n";
 
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
                 .setStyle(new NotificationCompat.BigTextStyle()
@@ -147,8 +149,7 @@ public class LogService extends Service implements SharedPreferences.OnSharedPre
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY,
-                //WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN & WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS &
-                //WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,
+                //WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
                 0,
                 PixelFormat.TRANSLUCENT
         );
@@ -243,7 +244,6 @@ public class LogService extends Service implements SharedPreferences.OnSharedPre
 
     private boolean isFiltered(LogLine line) {
         if (line != null) {
-            // TODO tag filter
             if (mAutoFilter && mForegroundAppPid != 0) {
                 if (line.getPid() != mForegroundAppPid) {
                     return true;
@@ -251,6 +251,11 @@ public class LogService extends Service implements SharedPreferences.OnSharedPre
             }
             if (!LogLine.LEVEL_VERBOSE.equals(mLogLevel)) {
                 if (line.getLevel() != null && !line.getLevel().equals(mLogLevel)) {
+                    return true;
+                }
+            }
+            if (mTagFilter != null && !mTagFilter.equals(getString(R.string.none))) {
+                if (line.getTag() == null || !line.getTag().toLowerCase().contains(mTagFilter.toLowerCase())) {
                     return true;
                 }
             }
@@ -287,7 +292,7 @@ public class LogService extends Service implements SharedPreferences.OnSharedPre
     @Subscribe
     public void onPlayLog(EventBus.PlayLogEvent event) {
         mIsLogPaused = false;
-        updateBuffer(null);
+        updateBuffer();
         showNotification();
     }
 
@@ -300,7 +305,7 @@ public class LogService extends Service implements SharedPreferences.OnSharedPre
     @Subscribe
     public void onClearLog(EventBus.ClearLogEvent event) {
         mLogBuffer = new LinkedList<LogLine>();
-        updateBuffer(null);
+        updateBuffer();
     }
 
     @Subscribe
@@ -335,6 +340,10 @@ public class LogService extends Service implements SharedPreferences.OnSharedPre
             updateBuffer();
         } else if (key.equals(getString(R.string.pref_auto_filter))) {
             mAutoFilter = mPrefs.getBoolean(getString(R.string.pref_auto_filter), false);
+            showNotification();
+            updateBuffer();
+        } else if (key.equals(getString(R.string.pref_tag_filter))) {
+            mTagFilter = mPrefs.getString(getString(R.string.pref_tag_filter), null);
             showNotification();
             updateBuffer();
         }
