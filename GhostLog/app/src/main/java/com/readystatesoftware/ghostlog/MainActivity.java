@@ -1,8 +1,10 @@
 package com.readystatesoftware.ghostlog;
 
 import android.app.ActionBar;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.ListPreference;
@@ -29,6 +31,9 @@ public class MainActivity extends PreferenceActivity {
      * shown on tablets.
      */
     private static final boolean ALWAYS_SIMPLE_PREFS = false;
+    private static final int CODE_TAG_FILTER = 1;
+
+    private Preference mTagFilterPref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +71,17 @@ public class MainActivity extends PreferenceActivity {
     }
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == CODE_TAG_FILTER) {
+            if (resultCode == RESULT_OK) {
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+                prefs.edit().putString(getString(R.string.pref_tag_filter), data.getAction()).apply();
+                mTagFilterPref.setSummary(data.getAction());
+            }
+        }
+    }
+
+    @Override
     public void onBuildHeaders(List<Header> target) {
         if (!isSimplePreferences(this)) {
             loadHeadersFromResource(R.xml.pref_headers, target);
@@ -96,6 +112,9 @@ public class MainActivity extends PreferenceActivity {
         getPreferenceScreen().addPreference(fakeHeader);
         addPreferencesFromResource(R.xml.pref_filters);
         bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_log_level)));
+        bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_tag_filter)));
+        setupTagFilterPreference(this, findPreference(getString(R.string.pref_tag_filter)));
+        mTagFilterPref = findPreference(getString(R.string.pref_tag_filter));
 
         // Add 'appearance' preferences.
         fakeHeader = new PreferenceCategory(this);
@@ -103,6 +122,17 @@ public class MainActivity extends PreferenceActivity {
         getPreferenceScreen().addPreference(fakeHeader);
         addPreferencesFromResource(R.xml.pref_appearance);
 
+    }
+
+    private static void setupTagFilterPreference(final Activity activity, Preference preference) {
+        preference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                Intent intent = new Intent(activity, TagFilterListActivity.class);
+                activity.startActivityForResult(intent, CODE_TAG_FILTER);
+                return true;
+            }
+        });
     }
 
     /**
@@ -173,13 +203,16 @@ public class MainActivity extends PreferenceActivity {
         return ALWAYS_SIMPLE_PREFS || !isXLargeTablet(context);
     }
 
-    public static class FilterPreferenceFragment extends PreferenceFragment {
+    public class FilterPreferenceFragment extends PreferenceFragment {
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             // Load the preferences from an XML resource
             addPreferencesFromResource(R.xml.pref_filters);
             bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_log_level)));
+            bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_tag_filter)));
+            setupTagFilterPreference(getActivity(), findPreference(getString(R.string.pref_tag_filter)));
+            mTagFilterPref = findPreference(getString(R.string.pref_tag_filter));
         }
     }
 

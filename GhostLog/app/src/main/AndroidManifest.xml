@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.readystatesoftware.ghostlog" >
 
+    <uses-permission android:name="android.permission.READ_LOGS" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.GET_TASKS" />
 
@@ -12,7 +13,7 @@
         android:theme="@style/AppTheme" >
         <activity
             android:name="com.readystatesoftware.ghostlog.MainActivity"
-            android:launchMode="singleInstance"
+            android:launchMode="singleTask"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -21,14 +22,20 @@
             </intent-filter>
         </activity>
         <activity
+            android:name="com.readystatesoftware.ghostlog.TagFilterListActivity"
+            android:label="@string/tag_filter"
+            android:parentActivityName="com.readystatesoftware.ghostlog.MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.readystatesoftware.ghostlog.MainActivity" />
+        </activity>
+        <activity
             android:name="com.readystatesoftware.ghostlog.ShareActivity"/>
-
         <service
             android:name="com.readystatesoftware.ghostlog.LogService"
             android:enabled="true"
             android:exported="false" >
         </service>
-
         <receiver
             android:name="com.readystatesoftware.ghostlog.LogReceiver"
             android:enabled="true"

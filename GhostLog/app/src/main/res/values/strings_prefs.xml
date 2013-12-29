@@ -4,10 +4,10 @@
     <string name="pref_auto_filter">pref_auto_filter</string>
     <string name="pref_log_level">pref_log_level</string>
     <string name="pref_tag_filter">pref_tag_filter</string>
+    <string name="pref_tag_filter_set">pref_tag_filter_set</string>
     <string name="pref_text_opacity">pref_text_opacity</string>
     <string name="pref_bg_opacity">pref_bg_opacity</string>
     <string name="pref_text_size">pref_text_size</string>
-    <string name="pref_screen_tag_filter">pref_screen_tag_filter</string>
 
     <string-array name="levels_values">
         <item>V</item>
