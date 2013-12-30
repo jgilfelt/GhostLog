@@ -37,9 +37,10 @@
             android:exported="false" >
         </service>
         <receiver
-            android:name="com.readystatesoftware.ghostlog.LogReceiver"
-            android:enabled="true"
-            android:exported="true" >
+            android:name="com.readystatesoftware.ghostlog.LogReceiver" >
+            <intent-filter>
+                <action android:name="com.readystatesoftware.ghostlog.integration.LOG" />
+            </intent-filter>
         </receiver>
     </application>
 

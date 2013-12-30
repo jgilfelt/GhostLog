@@ -36,6 +36,7 @@ public class LogService extends Service implements SharedPreferences.OnSharedPre
 
     private static boolean sIsRunning = false;
 
+    private boolean mIntegrationEnabled = false;
     private boolean mIsLogPaused = false;
     private String mLogLevel;
     private boolean mAutoFilter;
@@ -79,7 +80,6 @@ public class LogService extends Service implements SharedPreferences.OnSharedPre
         createSystemWindow();
         showNotification();
         startLogReader();
-        sendIntegrationBroadcast(true);
         return Service.START_NOT_STICKY;
     }
 
@@ -89,7 +89,9 @@ public class LogService extends Service implements SharedPreferences.OnSharedPre
         sIsRunning = false;
         mPrefs.unregisterOnSharedPreferenceChangeListener(this);
         stopLogReader();
-        sendIntegrationBroadcast(false);
+        if (mIntegrationEnabled) {
+            sendIntegrationBroadcast(false);
+        }
         removeSystemWindow();
         removeNotification();
         EventBus.getInstance().unregister(this);
@@ -210,6 +212,9 @@ public class LogService extends Service implements SharedPreferences.OnSharedPre
             protected void onPostExecute(Boolean ok) {
                 if (!ok) {
                     Toast.makeText(LogService.this, R.string.toast_no_root, Toast.LENGTH_LONG).show();
+                    // no root, enable integration
+                    mIntegrationEnabled = true;
+                    sendIntegrationBroadcast(true);
                 }
             }
         };
@@ -345,6 +350,13 @@ public class LogService extends Service implements SharedPreferences.OnSharedPre
         shareIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.share_subject) + " " + ts);
         shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(shareIntent);
+    }
+
+    @Subscribe
+    public void onIntegrationDataReceived(EventBus.IntegrationDataReceivedEvent event) {
+        if (mIntegrationEnabled) {
+            updateBuffer(new LogLine(event.line));
+        }
     }
 
     @Override

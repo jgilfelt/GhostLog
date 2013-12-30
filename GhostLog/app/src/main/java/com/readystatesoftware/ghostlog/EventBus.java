@@ -29,4 +29,11 @@ public class EventBus {
     public static class ShareLogEvent {
 
     }
+
+    public static class IntegrationDataReceivedEvent {
+        public String line;
+        public  IntegrationDataReceivedEvent(String line) {
+            this.line = line;
+        }
+    }
 }
