@@ -149,11 +149,8 @@ public class TagFilterListActivity extends ListActivity {
                 case 0:
                     mode.setTitle(null);
                     break;
-                case 1:
-                    mode.setTitle(R.string._1_tag_selected);
-                    break;
                 default:
-                    mode.setTitle("" + checkedCount + getString(R.string._tags_selected));
+                    mode.setTitle(checkedCount + getString(R.string._selected));
                     break;
             }
         }

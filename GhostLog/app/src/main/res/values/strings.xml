@@ -27,8 +27,7 @@
     <string name="delete">Delete</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
-    <string name="_1_tag_selected">1 tag selected</string>
-    <string name="_tags_selected">" tags selected"</string>
+    <string name="_selected">" selected"</string>
     <string name="information">Information</string>
     <string name="open_source_licences">Open Source Licences</string>
     <string name="toast_no_root">Failed to obtain root access - integration mode only</string>
