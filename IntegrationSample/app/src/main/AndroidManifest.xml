@@ -16,6 +16,17 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <receiver
+            android:name="com.readystatesoftware.ghostlog.integration.IntegrationReceiver" >
+            <intent-filter>
+                <action android:name="com.readystatesoftware.ghostlog.integration.COMMAND" />
+            </intent-filter>
+        </receiver>
+
+        <service
+            android:name="com.readystatesoftware.ghostlog.integration.IntegrationService" >
+        </service>
     </application>
 
 </manifest>
