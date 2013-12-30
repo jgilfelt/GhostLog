@@ -1,6 +1,5 @@
 package com.readystatesoftware.ghostlog;
 
-import android.app.ActivityManager;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -9,6 +8,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -44,14 +44,15 @@ public class LogService extends Service implements SharedPreferences.OnSharedPre
     private String mForegroundAppPkg;
     private String mTagFilter;
     private NotificationManager mNotificationManager;
-    private ActivityManager mActivityManager;
     private SharedPreferences mPrefs;
     private ListView mLogListView;
     private LogAdapter mAdapter;
     private LinkedList<LogLine> mLogBuffer;
     private LinkedList<LogLine> mLogBufferFiltered;
+
     private Handler mLogBufferUpdateHandler = new Handler();
     private LogReaderAsyncTask mLogReaderTask;
+    private ProcessMonitorAsyncTask mProcessMonitorTask;
 
     public static boolean isRunning() {
         return sIsRunning;
@@ -65,7 +66,6 @@ public class LogService extends Service implements SharedPreferences.OnSharedPre
     public void onCreate() {
         super.onCreate();
         mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        mActivityManager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
         mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         mPrefs.registerOnSharedPreferenceChangeListener(this);
         mLogLevel = mPrefs.getString(getString(R.string.pref_log_level), LogLine.LEVEL_VERBOSE);
@@ -80,6 +80,9 @@ public class LogService extends Service implements SharedPreferences.OnSharedPre
         createSystemWindow();
         showNotification();
         startLogReader();
+        if (mAutoFilter) {
+            startProcessMonitor();
+        }
         return Service.START_NOT_STICKY;
     }
 
@@ -92,6 +95,7 @@ public class LogService extends Service implements SharedPreferences.OnSharedPre
         if (mIntegrationEnabled) {
             sendIntegrationBroadcast(false);
         }
+        stopProcessMonitor();
         removeSystemWindow();
         removeNotification();
         EventBus.getInstance().unregister(this);
@@ -141,7 +145,9 @@ public class LogService extends Service implements SharedPreferences.OnSharedPre
                         getNotificationIntent(LogReceiver.ACTION_SHARE));
 
         // issue the notification
-        mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
+
+        //mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
+        startForeground(NOTIFICATION_ID, mBuilder.build());
 
     }
 
@@ -195,17 +201,10 @@ public class LogService extends Service implements SharedPreferences.OnSharedPre
         mLogBufferFiltered = new LinkedList<LogLine>();
         mLogReaderTask = new LogReaderAsyncTask(this) {
             @Override
-            protected void onProgressUpdate(LogUpdate... values) {
-                // process the latest logcat line
-                boolean change = false;
-                if (values[0].foregroundPid != mForegroundAppPid) {
-                    change = true;
-                }
-                mForegroundAppPkg = values[0].foregroundPkg;
-                mForegroundAppPid = values[0].foregroundPid;
-                updateBuffer(values[0].line);
-                if (change) {
-                    showNotification();
+            protected void onProgressUpdate(LogLine... values) {
+                // process the latest logcat lines
+                for (LogLine line : values) {
+                    updateBuffer(line);
                 }
             }
             @Override
@@ -218,7 +217,7 @@ public class LogService extends Service implements SharedPreferences.OnSharedPre
                 }
             }
         };
-        mLogReaderTask.execute(mActivityManager);
+        mLogReaderTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         Log.d(TAG, "log reader task started");
     }
 
@@ -228,6 +227,34 @@ public class LogService extends Service implements SharedPreferences.OnSharedPre
         }
         mLogReaderTask = null;
         Log.d(TAG, "log reader task stopped");
+    }
+
+    private void startProcessMonitor() {
+        mProcessMonitorTask = new ProcessMonitorAsyncTask(this) {
+            @Override
+            protected void onProgressUpdate(ForegroundProcessInfo... values) {
+                boolean change = false;
+                if (values[0].pid != mForegroundAppPid) {
+                    change = true;
+                }
+                mForegroundAppPkg = values[0].pkg;
+                mForegroundAppPid = values[0].pid;
+                updateBuffer();
+                if (change) {
+                    showNotification();
+                }
+            }
+        };
+        mProcessMonitorTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        Log.d(TAG, "process monitor task started");
+    }
+
+    private void stopProcessMonitor() {
+        if (mProcessMonitorTask != null) {
+            mProcessMonitorTask.cancel(true);
+        }
+        mProcessMonitorTask = null;
+        Log.d(TAG, "process monitor task stopped");
     }
 
     private void updateBuffer() {
@@ -372,6 +399,11 @@ public class LogService extends Service implements SharedPreferences.OnSharedPre
             updateBuffer();
         } else if (key.equals(getString(R.string.pref_auto_filter))) {
             mAutoFilter = mPrefs.getBoolean(getString(R.string.pref_auto_filter), false);
+            if (mAutoFilter) {
+                startProcessMonitor();
+            } else {
+                stopProcessMonitor();
+            }
             showNotification();
             updateBuffer();
         } else if (key.equals(getString(R.string.pref_tag_filter))) {

@@ -35,7 +35,7 @@ public class LogLine {
         mRaw = raw;
 
         String[] parts = raw.split(":? +");
-        mMessage = "";
+        StringBuffer sb = new StringBuffer();
         for (int i = 0; i < parts.length; i++) {
             final String part = parts[i];
             switch (i) {
@@ -67,11 +67,12 @@ public class LogLine {
                     break;
                 default:
                     if (i >= MSG_INDEX) {
-                        mMessage += (part + ((i == parts.length-1 || part.length() == 0) ? "" :" "));
+                        sb.append(part + ((i == parts.length-1 || part.length() == 0) ? "" :" "));
                     }
             }
 
         }
+        mMessage = sb.toString();
 
     }
 
