@@ -91,7 +91,7 @@ public class MainActivity extends Activity {
                 int random = (int)(Math.random() * ((Cheeses.sCheeseStrings.length-1) + 1));
                 Log.i(TAG_SPAM, Cheeses.sCheeseStrings[random]);
                 try {
-                    Thread.sleep(500);
+                    Thread.sleep(50);
                 } catch (InterruptedException e) {
                 }
             }

@@ -28,7 +28,7 @@ public class IntegrationLogReaderAsyncTask extends AsyncTask<Void, String, Boole
 
             while (!isCancelled()) {
                 String line = reader.readLine();
-                if (initBufferCount > 1 || !reader.ready()) {
+                if (initBufferCount > 2 || !reader.ready()) {
                     if (line != null) {
                         // publish result
                         publishProgress(line);
