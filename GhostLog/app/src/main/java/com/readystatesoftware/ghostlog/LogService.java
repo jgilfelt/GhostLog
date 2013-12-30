@@ -100,20 +100,19 @@ public class LogService extends Service implements SharedPreferences.OnSharedPre
 
         String level = LogLine.getLevelName(this, mLogLevel);
         String tag = (mTagFilter == null) ? getString(R.string.none) : mTagFilter;
-        String smallText = "";
-        String bigText = "";
 
+        String smallText = level;
+        String bigText = getString(R.string.log_level) + ": " + level + "\n";
         if (mAutoFilter && mForegroundAppPkg != null) {
-            smallText += mForegroundAppPkg + "/";
+            smallText = mLogLevel + "/" + mForegroundAppPkg;
             bigText += getString(R.string.auto_filter) + ": " + mForegroundAppPkg + "\n";
         } else {
             bigText += getString(R.string.auto_filter) + ": OFF\n";
         }
-        smallText += level;
-        bigText += getString(R.string.log_level) + ": " + level + "\n";
-
-        smallText += "/" + tag;
-        bigText += getString(R.string.tag_filter) + ": " + tag + "\n";
+        if (!tag.equals(getString(R.string.none))) {
+            smallText += "/" + tag;
+        }
+        bigText += getString(R.string.tag_filter) + ": " + tag;
 
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
                 .setStyle(new NotificationCompat.BigTextStyle()
