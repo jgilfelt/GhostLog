@@ -24,13 +24,16 @@ public class IntegrationLogReaderAsyncTask extends AsyncTask<Void, String, Boole
             process = Runtime.getRuntime().exec(args);
             reader = new BufferedReader(new InputStreamReader(process.getInputStream()), STREAM_BUFFER_SIZE);
 
+            int initBufferCount = 0;
+
             while (!isCancelled()) {
                 String line = reader.readLine();
-                // wait till our reader is blocking before publishing
-                // TODO might want to maintain a small buffer of lines here
-                if (!reader.ready() && line != null) {
-                    // publish result
-                    publishProgress(line);
+                if (initBufferCount > 1 || !reader.ready()) {
+                    if (line != null) {
+                        // publish result
+                        publishProgress(line);
+                    }
+                    initBufferCount++;
                 }
             }
 
