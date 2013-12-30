@@ -6,7 +6,6 @@ import android.os.Looper;
 import android.widget.Toast;
 
 import com.nolanlawson.logcat.util.UtilLogger;
-import com.readystatesoftware.ghostlog.R;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -77,7 +76,7 @@ public class SuperUserHelper {
                 try {
                     suProcess.waitFor();
                 } catch (InterruptedException e) {
-                    log.e(e, "cannot get pids");
+                    log.w("cannot get pids");
                 }
             }
             
@@ -146,9 +145,9 @@ public class SuperUserHelper {
         }
 	}
 	
-	public static void requestRoot(Context context) {
+	public static boolean requestRoot() {
 
-		showToast(context, R.string.toast_request_root);
+		//showToast(context, R.string.toast_request_root);
 		
 		Process process = null;
 		try {
@@ -165,22 +164,25 @@ public class SuperUserHelper {
 
 			process.waitFor();
 			if (process.exitValue() != 0) {
-				showToast(context, R.string.toast_no_root);
+				//showToast(context, R.string.toast_no_root);
 				failedToObtainRoot = true;
 			} else {
 				// success
-                // TODO PreferenceHelper.setJellybeanRootRan(context);
+                // PreferenceHelper.setJellybeanRootRan(context);
+                return true;
 			}
 
 		} catch (IOException e) {
 			log.w(e, "Cannot obtain root");
-			showToast(context, R.string.toast_no_root);
+			//showToast(context, R.string.toast_no_root);
 			failedToObtainRoot = true;
 		} catch (InterruptedException e) {
 			log.w(e, "Cannot obtain root");
-			showToast(context, R.string.toast_no_root);
+			//showToast(context, R.string.toast_no_root);
 			failedToObtainRoot = true;
 		}
+
+        return false;
 
 	}
 	

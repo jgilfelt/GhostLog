@@ -31,6 +31,7 @@
     <string name="_tags_selected">" tags selected"</string>
     <string name="information">Information</string>
     <string name="open_source_licences">Open Source Licences</string>
+    <string name="toast_no_root">Failed to obtain root access - integration mode only</string>
 
     <string-array name="levels_entries">
         <item>Verbose</item>
@@ -40,8 +41,5 @@
         <item>Error</item>
         <item>Assert</item>
     </string-array>
-
-    <string name="toast_no_root">Could not obtain root</string>
-    <string name="toast_request_root">Ghost Log requires root (superuser) access to read logs</string>
 
 </resources>

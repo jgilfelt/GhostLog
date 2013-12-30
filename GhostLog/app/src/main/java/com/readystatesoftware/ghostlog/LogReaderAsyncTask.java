@@ -2,55 +2,48 @@ package com.readystatesoftware.ghostlog;
 
 import android.app.ActivityManager;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.util.Log;
 import android.util.Pair;
 
+import com.nolanlawson.logcat.helper.LogcatHelper;
+import com.nolanlawson.logcat.helper.RuntimeHelper;
+import com.nolanlawson.logcat.helper.SuperUserHelper;
+
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.util.List;
 
-public class LogReaderAsyncTask extends AsyncTask<ActivityManager, LogReaderAsyncTask.LogUpdate, Void> {
+public class LogReaderAsyncTask extends AsyncTask<ActivityManager, LogReaderAsyncTask.LogUpdate, Boolean> {
 
     private static final String TAG = "LogReaderAsyncTask";
-
-    private static final String CMD_LOGCAT = "logcat -v threadtime *:V\n";
-    private static final String CMD_SU = "su";
-    private static final int STREAM_BUFFER_SIZE = 4096;
+    private static final int STREAM_BUFFER_SIZE = 8192;
 
     private int mPidCache = 0;
 
     @Override
-    protected Void doInBackground(ActivityManager... ams) {
+    protected Boolean doInBackground(ActivityManager... ams) {
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN
+                && !SuperUserHelper.requestRoot()) {
+            return false;
+        }
 
         Process process = null;
         BufferedReader reader = null;
-        BufferedWriter writer = null;
+        boolean ok = true;
 
         try {
 
-            process = Runtime.getRuntime().exec(CMD_SU);
-            writer = new BufferedWriter( new OutputStreamWriter(process.getOutputStream()), STREAM_BUFFER_SIZE);
+            process = LogcatHelper.getLogcatProcess(LogcatHelper.BUFFER_MAIN);
             reader = new BufferedReader(new InputStreamReader(process.getInputStream()), STREAM_BUFFER_SIZE);
-            writer.write(CMD_LOGCAT);
-            writer.flush();
 
             while (!isCancelled()) {
                 String line = reader.readLine();
-                if (line.length() == 0) {
-                    try {
-                        Thread.sleep(200);
-                    } catch (InterruptedException e) {
-
-                    }
-                    continue;
-                }
-
-                // TODO wait till our reader is blocking before publishing - might want to maintain
-                // a small buffer of lines here for startup
-                if (!reader.ready()) {
+                // wait till our reader is blocking before publishing
+                // TODO might want to maintain a small buffer of lines here
+                if (!reader.ready() && line != null) {
                     // publish result
                     final Pair<Integer, String> p = getForegroundApp(ams[0]);
                     final LogUpdate update = new LogUpdate(new LogLine(line), p.first, p.second);
@@ -61,10 +54,18 @@ public class LogReaderAsyncTask extends AsyncTask<ActivityManager, LogReaderAsyn
         } catch (IOException e) {
 
             e.printStackTrace();
+            ok = false;
 
         } finally {
 
-            if (reader != null) {
+            if (process != null) {
+                RuntimeHelper.destroy(process);
+            }
+
+            // post-jellybean, we just kill the process, so there's no need
+            // to close the bufferedReader.  Anyway, it just hangs.
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN
+                    && reader != null) {
                 try {
                     reader.close();
                 } catch (IOException e) {
@@ -72,21 +73,9 @@ public class LogReaderAsyncTask extends AsyncTask<ActivityManager, LogReaderAsyn
                 }
             }
 
-            if (writer != null) {
-                try {
-                    writer.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            if (process != null) {
-                process.destroy();
-            }
-
         }
 
-        return null;
+        return ok;
     }
 
     private Pair<Integer, String> getForegroundApp(ActivityManager am) {

@@ -99,6 +99,12 @@ public class MainActivity extends PreferenceActivity {
         return true;
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mTagFilterPref = null;
+    }
+
     /**
      * Shows the simplified settings UI if the device configuration if the
      * device configuration dictates that a simplified, single-pane UI should be

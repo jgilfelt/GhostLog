@@ -19,6 +19,7 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.squareup.otto.Subscribe;
 
@@ -182,6 +183,7 @@ public class LogService extends Service implements SharedPreferences.OnSharedPre
         mLogReaderTask = new LogReaderAsyncTask() {
             @Override
             protected void onProgressUpdate(LogUpdate... values) {
+                // process the latest logcat line
                 boolean change = false;
                 if (values[0].foregroundPid != mForegroundAppPid) {
                     change = true;
@@ -191,6 +193,12 @@ public class LogService extends Service implements SharedPreferences.OnSharedPre
                 updateBuffer(values[0].line);
                 if (change) {
                     showNotification();
+                }
+            }
+            @Override
+            protected void onPostExecute(Boolean ok) {
+                if (!ok) {
+                    Toast.makeText(LogService.this, R.string.toast_no_root, Toast.LENGTH_LONG).show();
                 }
             }
         };
