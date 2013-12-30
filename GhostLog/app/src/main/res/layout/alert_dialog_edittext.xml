@@ -26,6 +26,7 @@
         android:layout_marginLeft="8dip"
         android:layout_marginRight="8dip"
         android:scrollHorizontally="true"
+        android:inputType="text"
         android:gravity="fill_horizontal"
         android:textAppearance="?android:attr/textAppearanceMedium" />
         
