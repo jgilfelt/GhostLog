@@ -193,7 +193,7 @@ public class LogService extends Service implements SharedPreferences.OnSharedPre
     private void startLogReader() {
         mLogBuffer = new LinkedList<LogLine>();
         mLogBufferFiltered = new LinkedList<LogLine>();
-        mLogReaderTask = new LogReaderAsyncTask() {
+        mLogReaderTask = new LogReaderAsyncTask(this) {
             @Override
             protected void onProgressUpdate(LogUpdate... values) {
                 // process the latest logcat line
