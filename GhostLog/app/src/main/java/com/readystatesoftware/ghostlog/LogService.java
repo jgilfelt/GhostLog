@@ -267,11 +267,12 @@ public class LogService extends Service implements SharedPreferences.OnSharedPre
 
     private void setSystemViewBackground() {
         int v = mPrefs.getInt(getString(R.string.pref_bg_opacity), 0);
+        int level = 0;
         if (v > 0) {
             int a = (int) ((float)v/100f * 255);
-            mLogListView.setBackgroundColor(Color.argb(a, 0, 0, 0));
+            mLogListView.setBackgroundColor(Color.argb(a, level, level, level));
         } else {
-            mLogListView.setBackgroundColor(0);
+            mLogListView.setBackgroundDrawable(null);
         }
     }
 

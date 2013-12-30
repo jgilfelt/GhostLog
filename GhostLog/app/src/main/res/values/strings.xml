@@ -8,7 +8,7 @@
     <string name="background_opacity">Background Opacity</string>
     <string name="text_size">Text Size</string>
     <string name="auto_filter">Auto Filter</string>
-    <string name="auto_filter_summary">Log foreground process only</string>
+    <string name="auto_filter_summary">Foreground process only</string>
     <string name="log_level">Log Level</string>
     <string name="tag_filter">Tag Filter</string>
     <string name="none">None</string>
@@ -29,7 +29,8 @@
     <string name="cancel">Cancel</string>
     <string name="_1_tag_selected">1 tag selected</string>
     <string name="_tags_selected">" tags selected"</string>
-
+    <string name="information">Information</string>
+    <string name="open_source_licences">Open Source Licences</string>
 
     <string-array name="levels_entries">
         <item>Verbose</item>
@@ -39,8 +40,5 @@
         <item>Error</item>
         <item>Assert</item>
     </string-array>
-
-    <string name="toast_no_root">Could not obtain root.</string>
-    <string name="toast_request_root">Ghost Log requires root (superuser) access to read logs.</string>
 
 </resources>

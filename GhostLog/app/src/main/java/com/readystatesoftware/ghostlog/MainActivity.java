@@ -2,7 +2,14 @@ package com.readystatesoftware.ghostlog;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
@@ -15,14 +22,13 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.view.Gravity;
 import android.view.ViewGroup;
+import android.webkit.WebView;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 
 import java.util.List;
 
 public class MainActivity extends PreferenceActivity {
-
-
 
     /**
      * Determines whether to always show the simplified settings UI, where
@@ -33,8 +39,8 @@ public class MainActivity extends PreferenceActivity {
     private static final boolean ALWAYS_SIMPLE_PREFS = false;
     private static final int CODE_TAG_FILTER = 1;
 
+    private static Preference mTagFilterPref;
     private Switch mMainSwitch;
-    private Preference mTagFilterPref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +51,6 @@ public class MainActivity extends PreferenceActivity {
         mMainSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                // TODO
                 Intent intent = new Intent(MainActivity.this, LogService.class);
                 if (b) {
                     if (!LogService.isRunning()) {
@@ -123,6 +128,13 @@ public class MainActivity extends PreferenceActivity {
         getPreferenceScreen().addPreference(fakeHeader);
         addPreferencesFromResource(R.xml.pref_appearance);
 
+        // Add 'info' preferences.
+        fakeHeader = new PreferenceCategory(this);
+        fakeHeader.setTitle(R.string.information);
+        getPreferenceScreen().addPreference(fakeHeader);
+        addPreferencesFromResource(R.xml.pref_info);
+        setupOpenSourceInfoPreference(this, findPreference(getString(R.string.pref_info_open_source)));
+
     }
 
     private static void setupTagFilterPreference(final Activity activity, Preference preference) {
@@ -133,6 +145,23 @@ public class MainActivity extends PreferenceActivity {
             public boolean onPreferenceClick(Preference preference) {
                 Intent intent = new Intent(activity, TagFilterListActivity.class);
                 activity.startActivityForResult(intent, CODE_TAG_FILTER);
+                return true;
+            }
+        });
+    }
+
+    private static void setupOpenSourceInfoPreference(final Activity activity, Preference preference) {
+        preference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                FragmentManager fm = activity.getFragmentManager();
+                FragmentTransaction ft = fm.beginTransaction();
+                Fragment prev = fm.findFragmentByTag("dialog_licenses");
+                if (prev != null) {
+                    ft.remove(prev);
+                }
+                ft.addToBackStack(null);
+                new OpenSourceLicensesDialog().show(ft, "dialog_licenses");
                 return true;
             }
         });
@@ -206,7 +235,7 @@ public class MainActivity extends PreferenceActivity {
         return ALWAYS_SIMPLE_PREFS || !isXLargeTablet(context);
     }
 
-    public class FilterPreferenceFragment extends PreferenceFragment {
+    public static class FilterPreferenceFragment extends PreferenceFragment {
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
@@ -225,6 +254,40 @@ public class MainActivity extends PreferenceActivity {
             super.onCreate(savedInstanceState);
             // Load the preferences from an XML resource
             addPreferencesFromResource(R.xml.pref_appearance);
+        }
+    }
+
+    public static class InfoPreferenceFragment extends PreferenceFragment {
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            // Load the preferences from an XML resource
+            addPreferencesFromResource(R.xml.pref_info);
+            setupOpenSourceInfoPreference(getActivity(), findPreference(getString(R.string.pref_info_open_source)));
+        }
+    }
+
+    public static class OpenSourceLicensesDialog extends DialogFragment {
+
+        public OpenSourceLicensesDialog() {
+        }
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            WebView webView = new WebView(getActivity());
+            webView.loadUrl("file:///android_asset/licenses.html");
+
+            return new AlertDialog.Builder(getActivity())
+                    .setTitle("Open Source Licences")
+                    .setView(webView)
+                    .setPositiveButton(R.string.ok,
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                    dialog.dismiss();
+                                }
+                            }
+                    )
+                    .create();
         }
     }
 

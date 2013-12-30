@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceScreen
+        android:key="@string/pref_info_open_source"
+        android:title="@string/open_source_licences"/>
+
+</PreferenceScreen>

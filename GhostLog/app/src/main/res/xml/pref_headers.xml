@@ -7,5 +7,8 @@
     <header
         android:fragment="com.readystatesoftware.ghostlog.MainActivity$AppearancePreferenceFragment"
         android:title="@string/appearance" />
+    <header
+        android:fragment="com.readystatesoftware.ghostlog.MainActivity$InfoPreferenceFragment"
+        android:title="@string/information" />
 
 </preference-headers>
