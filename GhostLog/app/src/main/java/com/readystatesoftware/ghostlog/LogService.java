@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
@@ -21,6 +22,7 @@ import android.view.WindowManager;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.readystatesoftware.ghostlog.integration.Constants;
 import com.squareup.otto.Subscribe;
 
 import java.util.LinkedList;
@@ -77,6 +79,7 @@ public class LogService extends Service implements SharedPreferences.OnSharedPre
         createSystemWindow();
         showNotification();
         startLogReader();
+        sendIntegrationBroadcast(true);
         return Service.START_NOT_STICKY;
     }
 
@@ -86,6 +89,7 @@ public class LogService extends Service implements SharedPreferences.OnSharedPre
         sIsRunning = false;
         mPrefs.unregisterOnSharedPreferenceChangeListener(this);
         stopLogReader();
+        sendIntegrationBroadcast(false);
         removeSystemWindow();
         removeNotification();
         EventBus.getInstance().unregister(this);
@@ -174,6 +178,14 @@ public class LogService extends Service implements SharedPreferences.OnSharedPre
         } catch (Exception e) {
             Log.e(TAG, "Remove window failed");
         }
+    }
+
+    private void sendIntegrationBroadcast(boolean enable) {
+        Intent intent = new Intent(Constants.ACTION_COMMAND);
+        Bundle bundle = new Bundle();
+        bundle.putBoolean(Constants.EXTRA_ENABLED, enable);
+        intent.putExtras(bundle);
+        sendBroadcast(intent);
     }
 
     private void startLogReader() {
