@@ -29,7 +29,7 @@ public class LogAdapter extends BaseAdapter {
         mData = objects;
         mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
-        mDensity =  mContext.getResources().getDisplayMetrics().density;
+        mDensity = mContext.getResources().getDisplayMetrics().density;
         readPrefs();
     }
 
@@ -108,12 +108,21 @@ public class LogAdapter extends BaseAdapter {
         if (mTextSize <= 6) {
             mTimeViewWidth = dipToPixel(44);
             mTagViewWidth = dipToPixel(52);
-        } else if (mTextSize <=8) {
+        } else if (mTextSize <= 7) {
+            mTimeViewWidth = dipToPixel(52);
+            mTagViewWidth = dipToPixel(60);
+        } else if (mTextSize <= 8) {
             mTimeViewWidth = dipToPixel(64);
+            mTagViewWidth = dipToPixel(64);
+        } else if (mTextSize <= 9) {
+            mTimeViewWidth = dipToPixel(72);
             mTagViewWidth = dipToPixel(72);
-        } else {
+        } else if (mTextSize <= 10) {
             mTimeViewWidth = dipToPixel(80);
-            mTagViewWidth = dipToPixel(88);
+            mTagViewWidth = dipToPixel(76);
+        } else {
+            mTimeViewWidth = dipToPixel(88);
+            mTagViewWidth = dipToPixel(76);
         }
         int v = mPrefs.getInt(mContext.getString(R.string.pref_text_opacity), 0);
         mViewAlpha =  0.3f + (float) v/100;
