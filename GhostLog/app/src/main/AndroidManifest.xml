@@ -32,16 +32,8 @@
         <activity
             android:name="com.readystatesoftware.ghostlog.ShareActivity"/>
         <service
-            android:name="com.readystatesoftware.ghostlog.LogService"
-            android:enabled="true"
-            android:exported="false" >
-        </service>
-        <receiver
-            android:name="com.readystatesoftware.ghostlog.LogReceiver" >
-            <intent-filter>
-                <action android:name="com.readystatesoftware.ghostlog.integration.LOG" />
-            </intent-filter>
-        </receiver>
+            android:name="com.readystatesoftware.ghostlog.LogService" />
+
     </application>
 
 </manifest>

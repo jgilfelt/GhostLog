@@ -23,11 +23,11 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.readystatesoftware.ghostlog.integration.Constants;
-import com.squareup.otto.Subscribe;
 
 import java.util.LinkedList;
 
-public class LogService extends Service implements SharedPreferences.OnSharedPreferenceChangeListener {
+public class LogService extends Service implements
+        SharedPreferences.OnSharedPreferenceChangeListener, LogReceiver.Callbacks {
 
     private static final String TAG = "LogService";
 
@@ -49,6 +49,7 @@ public class LogService extends Service implements SharedPreferences.OnSharedPre
     private LogAdapter mAdapter;
     private LinkedList<LogLine> mLogBuffer;
     private LinkedList<LogLine> mLogBufferFiltered;
+    private LogReceiver mLogReceiver;
 
     private Handler mLogBufferUpdateHandler = new Handler();
     private LogReaderAsyncTask mLogReaderTask;
@@ -71,7 +72,9 @@ public class LogService extends Service implements SharedPreferences.OnSharedPre
         mLogLevel = mPrefs.getString(getString(R.string.pref_log_level), LogLine.LEVEL_VERBOSE);
         mAutoFilter = mPrefs.getBoolean(getString(R.string.pref_auto_filter), false);
         mTagFilter = mPrefs.getString(getString(R.string.pref_tag_filter), null);
-        EventBus.getInstance().register(this);
+        mLogReceiver = new LogReceiver(this);
+        registerReceiver(mLogReceiver, mLogReceiver.getIntentFilter());
+
     }
 
     @Override
@@ -91,6 +94,7 @@ public class LogService extends Service implements SharedPreferences.OnSharedPre
         super.onDestroy();
         sIsRunning = false;
         mPrefs.unregisterOnSharedPreferenceChangeListener(this);
+        unregisterReceiver(mLogReceiver);
         stopLogReader();
         if (mIntegrationEnabled) {
             sendIntegrationBroadcast(false);
@@ -98,7 +102,6 @@ public class LogService extends Service implements SharedPreferences.OnSharedPre
         stopProcessMonitor();
         removeSystemWindow();
         removeNotification();
-        EventBus.getInstance().unregister(this);
     }
 
     @Override
@@ -335,54 +338,8 @@ public class LogService extends Service implements SharedPreferences.OnSharedPre
             Intent intent = new Intent(getApplicationContext(), ShareActivity.class);
             return PendingIntent.getActivity(getApplicationContext(), 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
         } else {
-            Intent intent = new Intent(getApplicationContext(), LogReceiver.class);
-            intent.setAction(action);
+            Intent intent = new Intent(action);
             return PendingIntent.getBroadcast(getApplicationContext(), 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
-        }
-    }
-
-    @Subscribe
-    public void onPlayLog(EventBus.PlayLogEvent event) {
-        mIsLogPaused = false;
-        updateBuffer();
-        showNotification();
-    }
-
-    @Subscribe
-    public void onPauseLog(EventBus.PauseLogEvent event) {
-        mIsLogPaused = true;
-        showNotification();
-    }
-
-    @Subscribe
-    public void onClearLog(EventBus.ClearLogEvent event) {
-        mLogBuffer = new LinkedList<LogLine>();
-        updateBuffer();
-    }
-
-    @Subscribe
-    public void onShareLog(EventBus.ShareLogEvent event) {
-        StringBuffer sb = new StringBuffer();
-        for (LogLine line : mLogBufferFiltered) {
-            sb.append(line.getRaw());
-            sb.append("\n");
-        }
-        Time now = new Time();
-        now.setToNow();
-        String ts = now.format3339(false);
-
-        Intent shareIntent = new Intent(Intent.ACTION_SEND);
-        shareIntent.setType("text/plain");
-        shareIntent.putExtra(Intent.EXTRA_TEXT, sb.toString());
-        shareIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.share_subject) + " " + ts);
-        shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(shareIntent);
-    }
-
-    @Subscribe
-    public void onIntegrationDataReceived(EventBus.IntegrationDataReceivedEvent event) {
-        if (mIntegrationEnabled) {
-            updateBuffer(new LogLine(event.line));
         }
     }
 
@@ -410,6 +367,51 @@ public class LogService extends Service implements SharedPreferences.OnSharedPre
             mTagFilter = mPrefs.getString(getString(R.string.pref_tag_filter), null);
             showNotification();
             updateBuffer();
+        }
+    }
+
+    @Override
+    public void onLogPause() {
+        mIsLogPaused = true;
+        showNotification();
+    }
+
+    @Override
+    public void onLogResume() {
+        mIsLogPaused = false;
+        updateBuffer();
+        showNotification();
+    }
+
+    @Override
+    public void onLogClear() {
+        mLogBuffer = new LinkedList<LogLine>();
+        updateBuffer();
+    }
+
+    @Override
+    public void onLogShare() {
+        StringBuffer sb = new StringBuffer();
+        for (LogLine line : mLogBufferFiltered) {
+            sb.append(line.getRaw());
+            sb.append("\n");
+        }
+        Time now = new Time();
+        now.setToNow();
+        String ts = now.format3339(false);
+
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.setType("text/plain");
+        shareIntent.putExtra(Intent.EXTRA_TEXT, sb.toString());
+        shareIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.share_subject) + " " + ts);
+        shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(shareIntent);
+    }
+
+    @Override
+    public void onIntegrationDataReceived(String line) {
+        if (mIntegrationEnabled) {
+            updateBuffer(new LogLine(line));
         }
     }
 }

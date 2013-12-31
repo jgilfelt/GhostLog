@@ -1,6 +1,7 @@
 package com.readystatesoftware.ghostlog;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 
 public class ShareActivity extends Activity {
@@ -10,7 +11,8 @@ public class ShareActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // simply post the share event and finish
-        EventBus.getInstance().post(new EventBus.ShareLogEvent());
+        Intent intent = new Intent(LogReceiver.ACTION_SHARE);
+        sendBroadcast(intent);
         finish();
     }
 }
