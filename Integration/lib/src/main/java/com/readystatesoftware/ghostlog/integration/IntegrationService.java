@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
-import android.widget.Toast;
 
 public class IntegrationService extends Service {
 
@@ -29,7 +28,7 @@ public class IntegrationService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         sIsRunning = true;
         startLogReader();
-        Toast.makeText(this, "started integration service", Toast.LENGTH_LONG).show();
+        Log.i(TAG, "Started Ghost Log integration service");
         return Service.START_NOT_STICKY;
     }
 
@@ -38,7 +37,7 @@ public class IntegrationService extends Service {
         super.onDestroy();
         sIsRunning = false;
         stopLogReader();
-        Toast.makeText(this, "stopped integration service", Toast.LENGTH_LONG).show();
+        Log.i(TAG, "Stopped Ghost Log integration service");
     }
 
     @Override
@@ -55,7 +54,6 @@ public class IntegrationService extends Service {
             }
         };
         mLogReaderTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-        Log.d(TAG, "log reader task started");
     }
 
     private void stopLogReader() {
@@ -63,7 +61,6 @@ public class IntegrationService extends Service {
             mLogReaderTask.cancel(true);
         }
         mLogReaderTask = null;
-        Log.d(TAG, "log reader task stopped");
     }
 
     private void broadcastLine(final String line) {

@@ -24,7 +24,7 @@ public class IntegrationLogReaderAsyncTask extends AsyncTask<Void, String, Boole
             process = Runtime.getRuntime().exec(args);
             reader = new BufferedReader(new InputStreamReader(process.getInputStream()), STREAM_BUFFER_SIZE);
 
-            int initBufferCount = 0;
+            int initBufferCount = 0; // TODO
 
             while (!isCancelled()) {
                 String line = reader.readLine();
@@ -33,6 +33,7 @@ public class IntegrationLogReaderAsyncTask extends AsyncTask<Void, String, Boole
                         // publish result
                         publishProgress(line);
                     }
+                } else {
                     initBufferCount++;
                 }
             }
