@@ -31,5 +31,5 @@ android {
 }
 
 dependencies {
-    compile project(':lib')
+    compile project(':ghostlog-integration')
 }
