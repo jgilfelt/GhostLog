@@ -16,28 +16,18 @@
 
 package com.readystatesoftware.ghostlog;
 
-import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Build;
 
+import com.nolanlawson.logcat.helper.LogcatHelper;
+import com.nolanlawson.logcat.helper.RuntimeHelper;
 import com.nolanlawson.logcat.helper.SuperUserHelper;
-import com.nolanlawson.logcat.reader.LogcatReader;
-import com.nolanlawson.logcat.reader.LogcatReaderLoader;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 
 public class LogReaderAsyncTask extends AsyncTask<Void, LogLine, Boolean> {
-
-    private static final String TAG = "LogReaderAsyncTask";
-
-    private final Object mLock = new Object();
-    private boolean mKilled;
-    private LogcatReader mReader;
-    private LogcatReaderLoader mLoader;
-
-    public LogReaderAsyncTask(Context context) {
-        mLoader = LogcatReaderLoader.create(context, true);
-    }
 
     @Override
     protected Boolean doInBackground(Void... voids) {
@@ -47,41 +37,49 @@ public class LogReaderAsyncTask extends AsyncTask<Void, LogLine, Boolean> {
             return false;
         }
 
+        Process process = null;
+        BufferedReader reader = null;
         boolean ok = true;
 
         try {
 
-            mReader = mLoader.loadReader();
-            String line;
-            while ((line = mReader.readLine()) != null) {
+            process = LogcatHelper.getLogcatProcess(LogcatHelper.BUFFER_MAIN);
+            reader = new BufferedReader(new InputStreamReader(process.getInputStream()), 8192);
 
-                if (isCancelled()) {
-                    break;
-                }
-
-                if (mReader.readyToRecord()) {
-                    // "ready to record" in this case means all the initial lines have been flushed from the reader
-                    // just proceed as normal
-                    final LogLine logLine = new LogLine(line);
-                    publishProgress(logLine);
+            while (!isCancelled()) {
+                String line = reader.readLine();
+                if (line != null) {
+                    // publish result
+                    publishProgress(new LogLine(line));
                 }
             }
 
         } catch (IOException e) {
+
             e.printStackTrace();
             ok = false;
+
         } finally {
-            if (!mKilled) {
-                synchronized (mLock) {
-                    if (!mKilled && mReader != null) {
-                        mReader.killQuietly();
-                        mKilled = true;
-                    }
+
+            if (process != null) {
+                RuntimeHelper.destroy(process);
+            }
+
+            // post-jellybean, we just kill the process, so there's no need
+            // to close the bufferedReader.  Anyway, it just hangs.
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN
+                    && reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
+
         }
 
         return ok;
+
     }
 
 }

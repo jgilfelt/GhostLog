@@ -196,13 +196,9 @@ public class LogService extends Service implements
     }
 
     private void removeSystemWindow() {
-        try {
-            if(mLogListView != null && mLogListView.getParent() != null) {
-                final WindowManager wm = (WindowManager) getSystemService(WINDOW_SERVICE);
-                wm.removeView(mLogListView);
-            }
-        } catch (Exception e) {
-            Log.e(TAG, "Remove window failed");
+        if (mLogListView != null && mLogListView.getParent() != null) {
+            final WindowManager wm = (WindowManager) getSystemService(WINDOW_SERVICE);
+            wm.removeView(mLogListView);
         }
     }
 
@@ -217,7 +213,7 @@ public class LogService extends Service implements
     private void startLogReader() {
         mLogBuffer = new LinkedList<LogLine>();
         mLogBufferFiltered = new LinkedList<LogLine>();
-        mLogReaderTask = new LogReaderAsyncTask(this) {
+        mLogReaderTask = new LogReaderAsyncTask() {
             @Override
             protected void onProgressUpdate(LogLine... values) {
                 // process the latest logcat lines
@@ -236,7 +232,7 @@ public class LogService extends Service implements
             }
         };
         mLogReaderTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-        Log.d(TAG, "log reader task started");
+        Log.i(TAG, "Log reader task started");
     }
 
     private void stopLogReader() {
@@ -244,7 +240,7 @@ public class LogService extends Service implements
             mLogReaderTask.cancel(true);
         }
         mLogReaderTask = null;
-        Log.d(TAG, "log reader task stopped");
+        Log.i(TAG, "Log reader task stopped");
     }
 
     private void startProcessMonitor() {
@@ -264,7 +260,7 @@ public class LogService extends Service implements
             }
         };
         mProcessMonitorTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-        Log.d(TAG, "process monitor task started");
+        Log.i(TAG, "process monitor task started");
     }
 
     private void stopProcessMonitor() {
@@ -272,7 +268,7 @@ public class LogService extends Service implements
             mProcessMonitorTask.cancel(true);
         }
         mProcessMonitorTask = null;
-        Log.d(TAG, "process monitor task stopped");
+        Log.i(TAG, "process monitor task stopped");
     }
 
     private void updateBuffer() {
@@ -285,7 +281,7 @@ public class LogService extends Service implements
             public void run() {
 
                 // update raw buffer
-                if (line != null) {
+                if (line != null && line.getLevel() != null) {
                     mLogBuffer.add(line);
                 }
 
