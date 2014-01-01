@@ -30,13 +30,13 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.text.format.Time;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.readystatesoftware.ghostlog.integration.Constants;
 
@@ -45,8 +45,9 @@ import java.util.LinkedList;
 public class LogService extends Service implements
         SharedPreferences.OnSharedPreferenceChangeListener, LogReceiver.Callbacks {
 
-    private static final String TAG = "LogService";
+    public static final String ACTION_ROOT_FAILED = "com.readystatesoftware.ghostlog.ROOT_FAILED";
 
+    private static final String TAG = "LogService";
     private static final int NOTIFICATION_ID = 1138;
     private static final int LOG_BUFFER_LIMIT = 2000;
 
@@ -224,8 +225,9 @@ public class LogService extends Service implements
             @Override
             protected void onPostExecute(Boolean ok) {
                 if (!ok) {
-                    Toast.makeText(LogService.this, R.string.toast_no_root, Toast.LENGTH_LONG).show();
-                    // no root, enable integration
+                    // not root - notify activity
+                    LocalBroadcastManager.getInstance(LogService.this).sendBroadcast(new Intent(ACTION_ROOT_FAILED));
+                    // enable integration
                     mIntegrationEnabled = true;
                     sendIntegrationBroadcast(true);
                 }
@@ -425,4 +427,5 @@ public class LogService extends Service implements
             updateBuffer(new LogLine(line));
         }
     }
+
 }

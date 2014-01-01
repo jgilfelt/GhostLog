@@ -10,6 +10,7 @@
     <string name="pref_text_size">pref_text_size</string>
     <string name="pref_info_open_source">pref_info_open_source</string>
     <string name="pref_version">pref_version</string>
+    <string name="pref_root_fail_count">pref_root_fail_count</string>
 
     <string-array name="levels_values">
         <item>V</item>

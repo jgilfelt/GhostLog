@@ -34,6 +34,10 @@
     <string name="information">Application Info</string>
     <string name="open_source_licences">Open Source Licences</string>
     <string name="toast_no_root">Failed to obtain root access - integration mode only</string>
+    <string name="github">GitHub</string>
+    <string name="repo_url">https://github.com/jgilfelt/GhostLog</string>
+    <string name="no_root">No Root Access</string>
+    <string name="no_root_dialog">Ghost Log requires device root privileges to read system logs. It will run in integration mode on this device. Visit the GitHub project page to learn how to integrate your own apps.</string>
 
     <string-array name="levels_entries">
         <item>Verbose</item>
