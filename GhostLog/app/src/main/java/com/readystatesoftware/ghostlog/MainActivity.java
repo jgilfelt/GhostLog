@@ -47,6 +47,8 @@ public class MainActivity extends BasePreferenceActivity {
 
     private static Preference sTagFilterPref;
 
+    private SharedPreferences mPrefs;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,6 +75,16 @@ public class MainActivity extends BasePreferenceActivity {
         lp.rightMargin = getResources().getDimensionPixelSize(R.dimen.main_switch_margin_right);
         bar.setCustomView(mainSwitch, lp);
         bar.setDisplayShowCustomEnabled(true);
+
+        mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        if (!mPrefs.getBoolean(PreferenceManager.KEY_HAS_SET_DEFAULT_VALUES, false)) {
+            PreferenceManager.setDefaultValues(this, R.xml.pref_filters, true);
+            PreferenceManager.setDefaultValues(this, R.xml.pref_appearance, true);
+            SharedPreferences.Editor edit = mPrefs.edit();
+            edit.putBoolean(PreferenceManager.KEY_HAS_SET_DEFAULT_VALUES, true);
+            edit.apply();
+        }
+
     }
 
     @Override
@@ -85,8 +97,7 @@ public class MainActivity extends BasePreferenceActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == CODE_TAG_FILTER) {
             if (resultCode == RESULT_OK) {
-                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-                prefs.edit().putString(getString(R.string.pref_tag_filter), data.getAction()).apply();
+                mPrefs.edit().putString(getString(R.string.pref_tag_filter), data.getAction()).apply();
                 sTagFilterPref.setSummary(data.getAction());
             }
         }
