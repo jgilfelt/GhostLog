@@ -45,7 +45,7 @@ public class IntegrationService extends Service {
         sIsRunning = true;
         startLogReader();
         Log.i(TAG, "Started Ghost Log integration service");
-        return Service.START_NOT_STICKY;
+        return Service.START_STICKY;
     }
 
     @Override

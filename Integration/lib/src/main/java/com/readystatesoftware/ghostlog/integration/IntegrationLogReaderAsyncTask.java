@@ -25,8 +25,6 @@ import java.io.InputStreamReader;
 
 public class IntegrationLogReaderAsyncTask extends AsyncTask<Void, String, Boolean> {
 
-    private static final int STREAM_BUFFER_SIZE = 8192;
-
     @Override
     protected Boolean doInBackground(Void... voids) {
 
@@ -36,21 +34,18 @@ public class IntegrationLogReaderAsyncTask extends AsyncTask<Void, String, Boole
 
         try {
 
+            // clear buffer first
+            clearLogcatBuffer();
+
             String[] args = {"logcat", "-v", "threadtime"};
             process = Runtime.getRuntime().exec(args);
-            reader = new BufferedReader(new InputStreamReader(process.getInputStream()), STREAM_BUFFER_SIZE);
-
-            int initBufferCount = 0; // TODO
+            reader = new BufferedReader(new InputStreamReader(process.getInputStream()), 8192);
 
             while (!isCancelled()) {
-                String line = reader.readLine();
-                if (initBufferCount > 2 || !reader.ready()) {
-                    if (line != null) {
-                        // publish result
-                        publishProgress(line);
-                    }
-                } else {
-                    initBufferCount++;
+                final String line = reader.readLine();
+                if (line != null) {
+                    // publish result
+                    publishProgress(line);
                 }
             }
 
@@ -79,6 +74,17 @@ public class IntegrationLogReaderAsyncTask extends AsyncTask<Void, String, Boole
         }
 
         return ok;
+    }
+
+    private void clearLogcatBuffer() {
+        try {
+            Process process = Runtime.getRuntime().exec(new String[] {"logcat", "-c"});
+            process.waitFor();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }
