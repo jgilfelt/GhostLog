@@ -8,7 +8,7 @@
     <string name="background_opacity">Background Opacity</string>
     <string name="text_size">Text Size</string>
     <string name="auto_filter">Auto Filter</string>
-    <string name="auto_filter_summary">Foreground process only</string>
+    <string name="auto_filter_summary">Show foreground process only</string>
     <string name="log_level">Log Level</string>
     <string name="tag_filter">Tag Filter</string>
     <string name="no_filter">No Filter</string>
