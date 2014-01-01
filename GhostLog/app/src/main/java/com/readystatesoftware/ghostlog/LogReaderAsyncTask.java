@@ -18,7 +18,6 @@ package com.readystatesoftware.ghostlog;
 
 import android.os.AsyncTask;
 import android.os.Build;
-import android.util.Log;
 
 import com.nolanlawson.logcat.helper.LogcatHelper;
 import com.nolanlawson.logcat.helper.RuntimeHelper;
@@ -92,7 +91,6 @@ public class LogReaderAsyncTask extends AsyncTask<Void, LogLine, Boolean> {
         try {
             Process process = RuntimeHelper.exec(new ArrayList<String>(Arrays.asList("logcat", "-c")));
             process.waitFor();
-            Log.i("GhostLog", "exit code=" + process.exitValue());
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (IOException e) {
