@@ -27,6 +27,7 @@ import android.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceCategory;
@@ -138,12 +139,13 @@ public class MainActivity extends BasePreferenceActivity {
         getPreferenceScreen().addPreference(fakeHeader);
         addPreferencesFromResource(R.xml.pref_info);
         setupOpenSourceInfoPreference(this, findPreference(getString(R.string.pref_info_open_source)));
+        setupVersionPref(this, findPreference(getString(R.string.pref_version)));
 
     }
 
     private static void setupTagFilterPreference(final Activity activity, Preference preference) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
-        preference.setSummary(prefs.getString(activity.getString(R.string.pref_tag_filter), activity.getString(R.string.none)));
+        preference.setSummary(prefs.getString(activity.getString(R.string.pref_tag_filter), null));
         preference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
@@ -169,6 +171,15 @@ public class MainActivity extends BasePreferenceActivity {
                 return true;
             }
         });
+    }
+
+    private static void setupVersionPref(Activity activity, Preference preference) {
+        try {
+            String name = activity.getPackageManager().getPackageInfo(activity.getPackageName(), 0).versionName;
+            preference.setSummary(activity.getString(R.string.version) + " " + name);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
     public static class FilterPreferenceFragment extends PreferenceFragment {
@@ -199,6 +210,7 @@ public class MainActivity extends BasePreferenceActivity {
             // Load the preferences from an XML resource
             addPreferencesFromResource(R.xml.pref_info);
             setupOpenSourceInfoPreference(getActivity(), findPreference(getString(R.string.pref_info_open_source)));
+            setupVersionPref(getActivity(), findPreference(getString(R.string.pref_version)));
         }
     }
 

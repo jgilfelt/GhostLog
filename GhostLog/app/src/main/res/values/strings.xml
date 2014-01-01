@@ -11,6 +11,9 @@
     <string name="auto_filter_summary">Foreground process only</string>
     <string name="log_level">Log Level</string>
     <string name="tag_filter">Tag Filter</string>
+    <string name="no_filter">No Filter</string>
+    <string name="version">Version</string>
+    <string name="off">Off</string>
     <string name="none">None</string>
 
     <string name="notification_title">Log service is active</string>
@@ -28,7 +31,7 @@
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="_selected">" selected"</string>
-    <string name="information">Information</string>
+    <string name="information">Application Info</string>
     <string name="open_source_licences">Open Source Licences</string>
     <string name="toast_no_root">Failed to obtain root access - integration mode only</string>
 

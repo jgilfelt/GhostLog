@@ -50,13 +50,15 @@ public class TagFilterListActivity extends ListActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_tag_filter_list);
         mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         readTags();
     }
 
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
-        setResult(RESULT_OK, (new Intent()).setAction(mAdapter.getItem(position)));
+        String value = (position > 0) ? mAdapter.getItem(position) : null;
+        setResult(RESULT_OK, (new Intent()).setAction(value));
         finish();
     }
 
@@ -106,7 +108,7 @@ public class TagFilterListActivity extends ListActivity {
         Set<String> set = mPrefs.getStringSet(getString(R.string.pref_tag_filter_set), new HashSet<String>());
         mTags = new TreeSet<String>(set);
         ArrayList<String> data = new ArrayList<String>();
-        data.add(getString(R.string.none));
+        data.add(getString(R.string.no_filter));
         data.addAll(mTags);
         mAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_activated_1, data);
         getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);

@@ -15,7 +15,6 @@
         android:summary="@string/auto_filter_summary"/>
     <Preference
         android:key="@string/pref_tag_filter"
-        android:title="@string/tag_filter"
-        android:summary="@string/none"/>
+        android:title="@string/tag_filter" />
 
 </PreferenceScreen>

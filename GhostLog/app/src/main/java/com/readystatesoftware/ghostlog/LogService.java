@@ -102,7 +102,7 @@ public class LogService extends Service implements
         if (mAutoFilter) {
             startProcessMonitor();
         }
-        return Service.START_NOT_STICKY;
+        return Service.START_STICKY;
     }
 
     @Override
@@ -128,20 +128,21 @@ public class LogService extends Service implements
     private void showNotification() {
 
         String level = LogLine.getLevelName(this, mLogLevel);
-        String tag = (mTagFilter == null) ? getString(R.string.none) : mTagFilter;
 
         String smallText = level;
-        String bigText = getString(R.string.log_level) + ": " + level + "\n";
+        String bigText = getString(R.string.log_level) + ": " + level;
         if (mAutoFilter && mForegroundAppPkg != null) {
             smallText = mLogLevel + "/" + mForegroundAppPkg;
-            bigText += getString(R.string.auto_filter) + ": " + mForegroundAppPkg + "\n";
+            bigText += "\n" + getString(R.string.auto_filter) + ": " + mForegroundAppPkg;
         } else {
-            bigText += getString(R.string.auto_filter) + ": OFF\n";
+            bigText += "\n" + getString(R.string.auto_filter) + ": " + getString(R.string.off);
         }
-        if (!tag.equals(getString(R.string.none))) {
-            smallText += "/" + tag;
+        if (mTagFilter != null) {
+            smallText += "/" + mTagFilter;
+            bigText += "\n" + getString(R.string.tag_filter) + ": " + mTagFilter;
+        } else {
+            bigText += "\n" + getString(R.string.tag_filter) + ": " + getString(R.string.none);
         }
-        bigText += getString(R.string.tag_filter) + ": " + tag;
 
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
                 .setStyle(new NotificationCompat.BigTextStyle()
@@ -164,8 +165,6 @@ public class LogService extends Service implements
                         getNotificationIntent(LogReceiver.ACTION_SHARE));
 
         // issue the notification
-
-        //mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
         startForeground(NOTIFICATION_ID, mBuilder.build());
 
     }
@@ -324,7 +323,7 @@ public class LogService extends Service implements
                     return true;
                 }
             }
-            if (mTagFilter != null && !mTagFilter.equals(getString(R.string.none))) {
+            if (mTagFilter != null) {
                 if (line.getTag() == null || !line.getTag().toLowerCase().contains(mTagFilter.toLowerCase())) {
                     return true;
                 }
