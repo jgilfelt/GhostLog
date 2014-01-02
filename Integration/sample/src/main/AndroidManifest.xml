@@ -20,8 +20,7 @@
         <!--BEGIN GHOST LOG INTEGRATION-->
 
         <!--Receives intents from Ghost Log app to start & stop the integration service-->
-        <receiver
-            android:name="com.readystatesoftware.ghostlog.integration.IntegrationReceiver" >
+        <receiver android:name="com.readystatesoftware.ghostlog.integration.IntegrationReceiver" >
             <intent-filter>
                 <action android:name="com.readystatesoftware.ghostlog.integration.COMMAND" />
             </intent-filter>
