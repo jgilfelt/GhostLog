@@ -28,7 +28,7 @@ import android.widget.Button;
 
 public class MainActivity extends Activity {
 
-    private static final String TAG_HELLO = "Hello";
+    private static final String TAG_HELLO = "Hello Test";
     private static final String TAG_SPAM = "Spam";
 
     @Override
