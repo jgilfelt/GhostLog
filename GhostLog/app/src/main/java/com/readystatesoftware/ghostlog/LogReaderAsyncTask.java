@@ -70,8 +70,6 @@ public class LogReaderAsyncTask extends AsyncTask<Void, LogLine, Boolean> {
                 RuntimeHelper.destroy(process);
             }
 
-            // post-jellybean, we just kill the process, so there's no need
-            // to close the bufferedReader.  Anyway, it just hangs.
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN
                     && reader != null) {
                 try {

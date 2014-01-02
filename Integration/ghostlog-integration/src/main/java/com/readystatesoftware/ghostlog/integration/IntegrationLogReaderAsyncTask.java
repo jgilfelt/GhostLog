@@ -60,8 +60,6 @@ public class IntegrationLogReaderAsyncTask extends AsyncTask<Void, String, Boole
                 process.destroy();
             }
 
-            // post-jellybean, we just kill the process, so there's no need
-            // to close the bufferedReader.  Anyway, it just hangs.
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN
                     && reader != null) {
                 try {
