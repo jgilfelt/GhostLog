@@ -51,6 +51,7 @@ public class LogLine {
         mRaw = raw;
 
         String[] parts = raw.split(":? +");
+        // TODO compile a better matcher as tags with whitespace currently spill into message
         StringBuffer sb = new StringBuffer();
         for (int i = 0; i < parts.length; i++) {
             final String part = parts[i];
@@ -66,14 +67,14 @@ public class LogLine {
                     break;
                 case TID_INDEX:
                     try {
-                        mTid = Integer.parseInt(part.trim());
+                        mTid = Integer.parseInt(part);
                     } catch (NumberFormatException e) {
                         mTid = 0;
                     }
                     break;
                 case PID_INDEX:
                     try {
-                        mPid = Integer.parseInt(part.trim());
+                        mPid = Integer.parseInt(part);
                     } catch (NumberFormatException e) {
                         mPid = 0;
                     }

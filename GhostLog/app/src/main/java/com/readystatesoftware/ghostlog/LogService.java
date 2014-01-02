@@ -230,6 +230,7 @@ public class LogService extends Service implements
                     // enable integration
                     mIntegrationEnabled = true;
                     sendIntegrationBroadcast(true);
+                    updateBuffer(new LogLine(getString(R.string.canned_itegration_log_line)));
                 }
             }
         };

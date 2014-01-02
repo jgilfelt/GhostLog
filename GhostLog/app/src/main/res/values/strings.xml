@@ -38,6 +38,7 @@
     <string name="repo_url">https://github.com/jgilfelt/GhostLog</string>
     <string name="no_root">No Root Access</string>
     <string name="no_root_dialog">Ghost Log requires device root privileges to read system logs. It will run in integration mode on this device. Visit the GitHub project page to learn how to integrate your own apps.</string>
+    <string name="canned_itegration_log_line">0 0 0 0 V GhostLog: Running in Integration Mode</string>
 
     <string-array name="levels_entries">
         <item>Verbose</item>
