@@ -3,7 +3,7 @@ Ghost Log
 
 Ghost Log is an Android application that displays the device logcat buffer in a system overlay window.
 
-![screenshot](https://raw.github.com/jgilfelt/GhostLog/master/screens.png "screenshot")
+![screenshot](https://raw.github.com/jgilfelt/GhostLog/master/screens.jpg "screenshot")
 
 <a href="https://play.google.com/store/apps/details?id=com.readystatesoftware.ghostlog">
   <img alt="Android app on Google Play"
