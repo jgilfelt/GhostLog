@@ -17,16 +17,7 @@
             </intent-filter>
         </activity>
 
-        <!--BEGIN GHOST LOG INTEGRATION-->
-
-        <!--Receives intents from Ghost Log app to start & stop the integration service-->
-        <receiver android:name="com.readystatesoftware.ghostlog.integration.IntegrationReceiver" >
-            <intent-filter>
-                <action android:name="com.readystatesoftware.ghostlog.integration.COMMAND" />
-            </intent-filter>
-        </receiver>
-        <!--Reads logs and broadcasts them to Ghost Log-->
-        <service android:name="com.readystatesoftware.ghostlog.integration.IntegrationService" />
+        <!-- manifest integration is merged from library project by gradle -->
 
     </application>
 
