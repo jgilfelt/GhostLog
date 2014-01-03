@@ -38,9 +38,11 @@ If you are using the Gradle build system, simply add the following dependency in
 
 ```groovy
 dependencies {
-    compile 'com.readystatesoftware.ghostlog:ghostlog-integration:+'
+    debugCompile 'com.readystatesoftware.ghostlog:ghostlog-integration:+'
 }
 ```
+
+Using `debugCompile` (recommended) ensures the integration library is never compiled into a release build.
 
 #### Ant/Eclipse
 
