@@ -1,4 +1,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.readystatesoftware.ghostlog.integration">
 
+    <!--Receives intents from Ghost Log app to start & stop the integration service-->
+    <receiver android:name="com.readystatesoftware.ghostlog.integration.IntegrationReceiver">
+        <intent-filter>
+            <action android:name="com.readystatesoftware.ghostlog.integration.COMMAND" />
+        </intent-filter>
+    </receiver>
+    <!--Reads logs and broadcasts them to Ghost Log-->
+    <service android:name="com.readystatesoftware.ghostlog.integration.IntegrationService" />
+
 </manifest>
