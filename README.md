@@ -32,9 +32,9 @@ Integration will enable your app to receive messages from the Ghost Log app to s
 
 **NOTE: You should enable this integration for debug builds only to avoid exposing log output to third parties in production.**
 
-##### Gradle
+#### Gradle
 
-If you are using in Gradle build system, simply add the following dependency in your `build.gradle` file:
+If you are using the Gradle build system, simply add the following dependency in your `build.gradle` file:
 
 ```groovy
 dependencies {
@@ -42,7 +42,7 @@ dependencies {
 }
 ```
 
-##### Ant/Eclipse
+#### Ant/Eclipse
 
 If you are using the old build system, download and place the integration library [JAR][1] inside your project `libs` folder and add the following to your `AndroidManifest.xml` (inside the `<application>` tag):
 
