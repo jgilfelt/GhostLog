@@ -37,9 +37,6 @@ public class IntegrationService extends Service {
         return sIsRunning;
     }
 
-    public IntegrationService() {
-    }
-
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         sIsRunning = true;

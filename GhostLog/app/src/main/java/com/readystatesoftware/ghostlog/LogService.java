@@ -76,10 +76,6 @@ public class LogService extends Service implements
         return sIsRunning;
     }
 
-    public LogService() {
-
-    }
-
     @Override
     public void onCreate() {
         super.onCreate();
