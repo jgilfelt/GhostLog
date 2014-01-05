@@ -40,6 +40,8 @@ import android.widget.ListView;
 
 import com.readystatesoftware.ghostlog.integration.Constants;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.LinkedList;
 
 public class LogService extends Service implements
@@ -50,6 +52,7 @@ public class LogService extends Service implements
     private static final String TAG = "LogService";
     private static final int NOTIFICATION_ID = 1138;
     private static final int LOG_BUFFER_LIMIT = 2000;
+    private static final SimpleDateFormat LOGCAT_TIME_FORMAT = new SimpleDateFormat("HH:mm:ss.SSS");
 
     private static boolean sIsRunning = false;
 
@@ -222,11 +225,13 @@ public class LogService extends Service implements
             protected void onPostExecute(Boolean ok) {
                 if (!ok) {
                     // not root - notify activity
-                    LocalBroadcastManager.getInstance(LogService.this).sendBroadcast(new Intent(ACTION_ROOT_FAILED));
+                    LocalBroadcastManager.getInstance(LogService.this)
+                            .sendBroadcast(new Intent(ACTION_ROOT_FAILED));
                     // enable integration
                     mIntegrationEnabled = true;
                     sendIntegrationBroadcast(true);
-                    updateBuffer(new LogLine(getString(R.string.canned_itegration_log_line)));
+                    updateBuffer(new LogLine("0 " + LOGCAT_TIME_FORMAT.format(new Date())
+                            + " 0 0 " + getString(R.string.canned_itegration_log_line)));
                 }
             }
         };
