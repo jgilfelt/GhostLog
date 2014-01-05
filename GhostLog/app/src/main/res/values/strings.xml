@@ -40,8 +40,8 @@
     <string name="no_root_dialog">Ghost Log requires device root privileges to read system logs. It will run in integration mode on this device. Visit the GitHub project page to learn how to integrate your own apps.</string>
     <string name="canned_integration_log_line">I GhostLog: Running in Integration Mode</string>
 
-    <string name="permission_read_logs_label">read logcat output for a Ghost Log integrated app</string>
-    <string name="permission_read_logs_description">Allows an application to read the logcat output for a Ghost Log integrated app. This allows it to discover general information about integrated apps that is being written to the log.</string>
+    <string name="permission_read_logs_label">read logcat output for Ghost Log integrated apps</string>
+    <string name="permission_read_logs_description">Allows an application to read the logcat output for Ghost Log integrated apps. This allows it to discover general information about integrated apps that is being written to the log.</string>
 
     <string name="copyright">&#169; readyState Software Ltd</string>
     <string name="by_author">by Jeff Gilfelt</string>
