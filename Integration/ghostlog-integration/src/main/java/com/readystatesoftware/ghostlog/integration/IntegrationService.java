@@ -84,7 +84,7 @@ public class IntegrationService extends Service {
                 Bundle bundle = new Bundle();
                 bundle.putString(Constants.EXTRA_LINE, line);
                 intent.putExtras(bundle);
-                sendBroadcast(intent);
+                sendBroadcast(intent, Constants.PERMISSION_READ_LOGS);
             }
         });
     }

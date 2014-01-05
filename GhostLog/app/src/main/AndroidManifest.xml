@@ -2,10 +2,17 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.readystatesoftware.ghostlog" >
 
+    <permission
+        android:name="com.readystatesoftware.ghostlog.permission.READ_LOGS"
+        android:protectionLevel="normal"
+        android:label="@string/permission_read_logs_label"
+        android:description="@string/permission_read_logs_description" />
+
     <uses-permission android:name="android.permission.READ_LOGS" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.GET_TASKS" />
     <uses-permission android:name="android.permission.ACCESS_SUPERUSER" />
+    <uses-permission android:name="com.readystatesoftware.ghostlog.permission.READ_LOGS" />
 
     <application
         android:allowBackup="true"
