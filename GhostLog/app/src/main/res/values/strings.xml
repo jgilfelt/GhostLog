@@ -21,8 +21,7 @@
     <string name="pause">Pause</string>
     <string name="clear">Clear</string>
     <string name="share">Share</string>
-
-    <string name="share_subject">LogCat Output</string>
+    <string name="share_subject">Logcat Output</string>
 
     <string name="add_tag_filter">Add Tag Filter</string>
     <string name="new_tag_filter">New Tag Filter</string>
@@ -33,15 +32,19 @@
     <string name="_selected">" selected"</string>
     <string name="information">Application Info</string>
     <string name="open_source_licences">Open Source Licences</string>
+    <string name="about">About</string>
     <string name="toast_no_root">Failed to obtain root access - integration mode only</string>
     <string name="github">GitHub</string>
     <string name="repo_url">https://github.com/jgilfelt/GhostLog</string>
     <string name="no_root">No Root Access</string>
     <string name="no_root_dialog">Ghost Log requires device root privileges to read system logs. It will run in integration mode on this device. Visit the GitHub project page to learn how to integrate your own apps.</string>
-    <string name="canned_itegration_log_line">I GhostLog: Running in Integration Mode</string>
+    <string name="canned_integration_log_line">I GhostLog: Running in Integration Mode</string>
 
     <string name="permission_read_logs_label">read logcat output for a Ghost Log integrated app</string>
     <string name="permission_read_logs_description">Allows an application to read the logcat output for a Ghost Log integrated app. This allows it to discover general information about integrated apps that is being written to the log.</string>
+
+    <string name="copyright">&#169; readyState Software Ltd</string>
+    <string name="by_author">by Jeff Gilfelt</string>
 
     <string-array name="levels_entries">
         <item>Verbose</item>

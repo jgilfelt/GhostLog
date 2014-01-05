@@ -39,10 +39,13 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.widget.CompoundButton;
 import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.List;
@@ -229,24 +232,32 @@ public class MainActivity extends BasePreferenceActivity {
             public boolean onPreferenceClick(Preference preference) {
                 FragmentManager fm = activity.getFragmentManager();
                 FragmentTransaction ft = fm.beginTransaction();
-                Fragment prev = fm.findFragmentByTag("dialog_licenses");
+                Fragment prev = fm.findFragmentByTag("dialog");
                 if (prev != null) {
                     ft.remove(prev);
                 }
                 ft.addToBackStack(null);
-                new OpenSourceLicensesDialog().show(ft, "dialog_licenses");
+                new OpenSourceLicensesDialog().show(ft, "dialog");
                 return true;
             }
         });
     }
 
-    private static void setupVersionPref(Activity activity, Preference preference) {
-        try {
-            String name = activity.getPackageManager().getPackageInfo(activity.getPackageName(), 0).versionName;
-            preference.setSummary(activity.getString(R.string.version) + " " + name);
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
+    private static void setupVersionPref(final Activity activity, Preference preference) {
+        preference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                FragmentManager fm = activity.getFragmentManager();
+                FragmentTransaction ft = fm.beginTransaction();
+                Fragment prev = fm.findFragmentByTag("dialog");
+                if (prev != null) {
+                    ft.remove(prev);
+                }
+                ft.addToBackStack(null);
+                new AboutDialog().show(ft, "dialog");
+                return true;
+            }
+        });
     }
 
     public static class FilterPreferenceFragment extends PreferenceFragment {
@@ -294,6 +305,39 @@ public class MainActivity extends BasePreferenceActivity {
             return new AlertDialog.Builder(getActivity())
                     .setTitle(R.string.open_source_licences)
                     .setView(webView)
+                    .setPositiveButton(R.string.ok,
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                    dialog.dismiss();
+                                }
+                            }
+                    )
+                    .create();
+        }
+    }
+
+    public static class AboutDialog extends DialogFragment {
+
+        public AboutDialog() {
+        }
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+            View content = inflater.inflate(R.layout.dialog_about, null, false);
+            TextView version = (TextView) content.findViewById(R.id.version);
+
+            try {
+                String name = getActivity().getPackageManager().getPackageInfo(getActivity().getPackageName(), 0).versionName;
+                version.setText(getString(R.string.version) + " " + name);
+            } catch (PackageManager.NameNotFoundException e) {
+                e.printStackTrace();
+            }
+
+            return new AlertDialog.Builder(getActivity())
+                    .setTitle(R.string.app_name)
+                    .setView(content)
                     .setPositiveButton(R.string.ok,
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int whichButton) {

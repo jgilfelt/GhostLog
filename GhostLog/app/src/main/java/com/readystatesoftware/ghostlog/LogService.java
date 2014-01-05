@@ -231,7 +231,7 @@ public class LogService extends Service implements
                     mIntegrationEnabled = true;
                     sendIntegrationBroadcast(true);
                     updateBuffer(new LogLine("0 " + LOGCAT_TIME_FORMAT.format(new Date())
-                            + " 0 0 " + getString(R.string.canned_itegration_log_line)));
+                            + " 0 0 " + getString(R.string.canned_integration_log_line)));
                 }
             }
         };

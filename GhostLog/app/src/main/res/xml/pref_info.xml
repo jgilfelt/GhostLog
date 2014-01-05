@@ -5,8 +5,7 @@
         android:key="@string/pref_info_open_source"
         android:title="@string/open_source_licences"/>
     <PreferenceScreen
-        android:enabled="false"
         android:key="@string/pref_version"
-        android:title="@string/app_name" />
+        android:title="@string/about" />
 
 </PreferenceScreen>
