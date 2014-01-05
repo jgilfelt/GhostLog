@@ -50,7 +50,8 @@ If you are using the old build system, download and place the integration librar
 
 ```xml
 <!--Receives intents from Ghost Log app to start & stop the integration service-->
-<receiver android:name="com.readystatesoftware.ghostlog.integration.IntegrationReceiver" >
+<receiver android:name="com.readystatesoftware.ghostlog.integration.IntegrationReceiver" 
+    android:permission="com.readystatesoftware.ghostlog.permission.READ_LOGS" >
     <intent-filter>
         <action android:name="com.readystatesoftware.ghostlog.integration.COMMAND" />
     </intent-filter>
