@@ -16,14 +16,16 @@
 
 package com.readystatesoftware.ghostlog.integration;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Bundle;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-public class IntegrationLogReaderAsyncTask extends AsyncTask<Void, String, Boolean> {
+public class IntegrationLogReaderAsyncTask extends AsyncTask<Void, Intent, Boolean> {
 
     @Override
     protected Boolean doInBackground(Void... voids) {
@@ -45,7 +47,7 @@ public class IntegrationLogReaderAsyncTask extends AsyncTask<Void, String, Boole
                 final String line = reader.readLine();
                 if (line != null) {
                     // publish result
-                    publishProgress(line);
+                    publishProgress(getBroadcastIntent(line));
                 }
             }
 
@@ -72,6 +74,14 @@ public class IntegrationLogReaderAsyncTask extends AsyncTask<Void, String, Boole
         }
 
         return ok;
+    }
+
+    private Intent getBroadcastIntent(String line) {
+        Intent intent = new Intent(Constants.ACTION_LOG);
+        Bundle bundle = new Bundle();
+        bundle.putString(Constants.EXTRA_LINE, line);
+        intent.putExtras(bundle);
+        return intent;
     }
 
     private void clearLogcatBuffer() {

@@ -19,8 +19,6 @@ package com.readystatesoftware.ghostlog.integration;
 import android.app.Service;
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -30,7 +28,6 @@ public class IntegrationService extends Service {
 
     private static boolean sIsRunning = false;
 
-    private Handler mLogBufferUpdateHandler = new Handler();
     private IntegrationLogReaderAsyncTask mLogReaderTask;
 
     public static boolean isRunning() {
@@ -61,9 +58,9 @@ public class IntegrationService extends Service {
     private void startLogReader() {
         mLogReaderTask = new IntegrationLogReaderAsyncTask() {
             @Override
-            protected void onProgressUpdate(String... values) {
+            protected void onProgressUpdate(Intent... values) {
                 // process the latest logcat line
-                broadcastLine(values[0]);
+                sendBroadcast(values[0], Constants.PERMISSION_READ_LOGS);
             }
         };
         mLogReaderTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
@@ -74,19 +71,6 @@ public class IntegrationService extends Service {
             mLogReaderTask.cancel(true);
         }
         mLogReaderTask = null;
-    }
-
-    private void broadcastLine(final String line) {
-        mLogBufferUpdateHandler.post( new Runnable() {
-            @Override
-            public void run() {
-                Intent intent = new Intent(Constants.ACTION_LOG);
-                Bundle bundle = new Bundle();
-                bundle.putString(Constants.EXTRA_LINE, line);
-                intent.putExtras(bundle);
-                sendBroadcast(intent, Constants.PERMISSION_READ_LOGS);
-            }
-        });
     }
 
 }
