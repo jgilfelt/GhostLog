@@ -38,7 +38,7 @@ If you are using the Gradle build system, simply add the following dependency in
 
 ```groovy
 dependencies {
-    debugCompile 'com.readystatesoftware.ghostlog:ghostlog-integration:+'
+    debugCompile 'com.readystatesoftware.ghostlog:ghostlog-integration:+@aar'
 }
 ```
 
