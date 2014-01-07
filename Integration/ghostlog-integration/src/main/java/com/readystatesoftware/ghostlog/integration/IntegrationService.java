@@ -16,9 +16,11 @@
 
 package com.readystatesoftware.ghostlog.integration;
 
+import android.annotation.TargetApi;
 import android.app.Service;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -55,6 +57,7 @@ public class IntegrationService extends Service {
         throw new UnsupportedOperationException("Not implemented");
     }
 
+    @TargetApi(11)
     private void startLogReader() {
         mLogReaderTask = new IntegrationLogReaderAsyncTask() {
             @Override
@@ -63,7 +66,12 @@ public class IntegrationService extends Service {
                 sendBroadcast(values[0], Constants.PERMISSION_READ_LOGS);
             }
         };
-        mLogReaderTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
+            mLogReaderTask.execute();
+        } else {
+            mLogReaderTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        }
+
     }
 
     private void stopLogReader() {
