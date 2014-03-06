@@ -16,13 +16,18 @@
 
 package com.readystatesoftware.ghostlog.integration;
 
-import android.annotation.TargetApi;
 import android.app.Service;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.IBinder;
 import android.util.Log;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 public class IntegrationService extends Service {
 
@@ -30,7 +35,14 @@ public class IntegrationService extends Service {
 
     private static boolean sIsRunning = false;
 
-    private IntegrationLogReaderAsyncTask mLogReaderTask;
+    private HandlerThread mLogReaderThread = new HandlerThread("log-reader");
+    private Handler mLogReaderHandler;
+    private Runnable mLogReader = new Runnable() {
+        @Override
+        public void run() {
+            readLogs();
+        }
+    };
 
     public static boolean isRunning() {
         return sIsRunning;
@@ -57,28 +69,88 @@ public class IntegrationService extends Service {
         throw new UnsupportedOperationException("Not implemented");
     }
 
-    @TargetApi(11)
     private void startLogReader() {
-        mLogReaderTask = new IntegrationLogReaderAsyncTask() {
-            @Override
-            protected void onProgressUpdate(Intent... values) {
-                // process the latest logcat line
-                sendBroadcast(values[0], Constants.PERMISSION_READ_LOGS);
-            }
-        };
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
-            mLogReaderTask.execute();
-        } else {
-            mLogReaderTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-        }
-
+        mLogReaderThread.start();
+        mLogReaderHandler = new Handler(mLogReaderThread.getLooper());
+        mLogReaderHandler.post(mLogReader);
     }
 
     private void stopLogReader() {
-        if (mLogReaderTask != null) {
-            mLogReaderTask.cancel(true);
+        if (mLogReaderHandler != null) {
+            mLogReaderHandler.removeCallbacks(mLogReader);
+            mLogReaderThread.quit();
+            mLogReaderHandler = null;
         }
-        mLogReaderTask = null;
+    }
+
+    // background stuff
+
+    private boolean readLogs() {
+
+        Process process = null;
+        BufferedReader reader = null;
+        boolean ok = true;
+
+        try {
+
+            // clear buffer first
+            clearLogcatBuffer();
+
+            String[] args = {"logcat", "-v", "threadtime"};
+            process = Runtime.getRuntime().exec(args);
+            reader = new BufferedReader(new InputStreamReader(process.getInputStream()), 8192);
+
+            while (sIsRunning) {
+                final String line = reader.readLine();
+                if (line != null) {
+                    // publish result
+                    sendBroadcast(getBroadcastIntent(line), Constants.PERMISSION_READ_LOGS);
+                }
+            }
+
+        } catch (IOException e) {
+
+            e.printStackTrace();
+            ok = false;
+
+        } finally {
+
+            if (process != null) {
+                process.destroy();
+            }
+
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN
+                    && reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+        }
+
+        return ok;
+
+    }
+
+    private Intent getBroadcastIntent(String line) {
+        Intent intent = new Intent(Constants.ACTION_LOG);
+        Bundle bundle = new Bundle();
+        bundle.putString(Constants.EXTRA_LINE, line);
+        intent.putExtras(bundle);
+        return intent;
+    }
+
+    private void clearLogcatBuffer() {
+        try {
+            Process process = Runtime.getRuntime().exec(new String[] {"logcat", "-c"});
+            process.waitFor();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }
