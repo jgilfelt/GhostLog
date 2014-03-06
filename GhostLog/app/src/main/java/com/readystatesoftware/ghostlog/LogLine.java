@@ -27,7 +27,6 @@ public class LogLine {
     private static final int TID_INDEX = 3;
     private static final int LEVEL_INDEX = 4;
     private static final int TAG_INDEX = 5;
-    private static final int MSG_INDEX = 6;
 
     public static final String LEVEL_VERBOSE = "V";
     private static final String LEVEL_DEBUG = "D";
@@ -50,8 +49,10 @@ public class LogLine {
 
         mRaw = raw;
 
-        String[] parts = raw.split(":? +");
-        // TODO compile a better matcher as tags with whitespace currently spill into message
+        String[] outer = raw.split(": ");
+        String[] parts = outer[0].split(" +");
+
+        // parse metadata
         StringBuffer sb = new StringBuffer();
         for (int i = 0; i < parts.length; i++) {
             final String part = parts[i];
@@ -79,15 +80,20 @@ public class LogLine {
                         mPid = 0;
                     }
                     break;
-                case TAG_INDEX:
-                    mTag = part;
-                    break;
                 default:
-                    if (i >= MSG_INDEX) {
+                    if (i >= TAG_INDEX) {
                         sb.append(part + ((i == parts.length-1 || part.length() == 0) ? "" :" "));
                     }
             }
 
+        }
+        mTag = sb.toString();
+
+        // parse message
+        sb = new StringBuffer();
+        for (int i = 1; i < outer.length; i++) {
+            final String part = outer[i];
+            sb.append(part + ((i == outer.length-1 || part.length() == 0) ? "" :": "));
         }
         mMessage = sb.toString();
 
